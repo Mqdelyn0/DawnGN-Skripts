@@ -1,0 +1,37 @@
+every 10 minutes:
+    set {reactionType} to a random number between 1 and 2
+    if {reactionType} is 1:
+        delete {reactionType}
+        set {reactions::*} to "COW", "WHEAT", "SUGAR", "MELON", "CHICKEN", "DAWNGN", "RICH", "POTATO", "LOL" and "GENERATOR"
+        set {chatReaction} to a random element of {reactions::*}
+        broadcast "%nl%&6&lREACTION &eFirst one to say &e&n%{chatReaction}%&e wins $2000%nl% &r"
+        wait 15 seconds
+        if {chatReaction} is set:
+            delete {chatReaction}
+            broadcast "%nl%&6&lREACTION &cNo one reacted fast enough! :/%nl% &r"
+            delete {reactions::*}
+    else:
+        delete {reactionType}
+        set {reactionNumber_1} to a random number between 1 and 10
+        set {reactionNumber_2} to a random number between 1 and 10
+        set {chatReaction} to {reactionNumber_1} + {reactionNumber_2}
+        broadcast "%nl%&6&lREACTION &eFirst one solve this wins $2000: &e&n%{reactionNumber_1}% &e&n+ %{reactionNumber_2}%%nl% &r"
+        wait 15 seconds
+        if {chatReaction} is set:
+            delete {chatReaction}
+            broadcast "%nl%&6&lREACTION &cNo one reacted fast enough! :/%nl% &r"
+            delete {reactionNumber_1}
+            delete {reactionNumber_2}
+
+on chat:
+    if {chatReaction} is set:
+        if message is {chatReaction}:
+            cancel event
+            set {_winner} to player
+            delete {chatReaction}
+            delete {reactions::*}
+            delete {reactionNumber_1}
+            delete {reactionNumber_2}
+            Money_Add(player, 2000)
+            broadcast "%nl%&6&lREACTION &e&n%{_winner}%&e won &n$2000&e!%nl% &r"
+            stop
