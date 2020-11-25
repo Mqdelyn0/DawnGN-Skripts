@@ -1,0 +1,238 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons:
+# Last Updated: 11/17/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &5&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &d
+    color_third: &5
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &d<script>.sk &7reloaded in &d<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &d<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # CITIZENS CONFIGURATION
+    main_npc: 0
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+# OPEN GUI TO BUY PASS TIME.
+function Mining_OpenPassShopGUI(plr: player, time: timespan = 0 seconds, cost: integer = 0, recalled: boolean = false):
+    set {_uuid} to uuid of {_plr}
+    Lib_PlaySound({_plr}, "BLOCK_NOTE_BLOCK_PLING", 1.0) if {_recalled} = false
+    set {mining::pass_shop_amount::%{_uuid}%} to {_time}
+    set {mining::pass_shop_cost::%{_uuid}%} to {_cost}
+    create a gui with virtual chest with 6 rows named "{@color_third}Mining GUI: Pass Shop":
+        loop 54 times:
+            make next gui slot with {@filler}
+        make gui slot 10 with emerald block named "&aAdd 1 Minute":
+            add 60 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 1000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 19 with emerald block named "&aAdd 2 Minutes":
+            add 120 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 2000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 28 with emerald block named "&aAdd 5 Minutes":
+            add 300 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 5000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 37 with emerald block named "&aAdd 10 Minutes":
+            add 600 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 10000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 11 with emerald block named "&aAdd 20 Minutes":
+            add 1200 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 20000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 20 with emerald block named "&aAdd 30 Minutes":
+            add 1800 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 30000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 29 with emerald block named "&aAdd 45 Minutes":
+            add 2700 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 45000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 38 with emerald block named "&aAdd 60 Minutes":
+            add 3600 seconds to {mining::pass_shop_amount::%{_uuid}%}
+            add 60000 to {mining::pass_shop_cost::%{_uuid}%}
+            Mining_OpenPassShopGUI({_plr}, {mining::pass_shop_amount::%{_uuid}%}, {mining::pass_shop_cost::%{_uuid}%}, true)
+        make gui slot 22 with enchanted book named "{@color_second}Pass Shop Information" with lore " ", "{@color_first}Here, You can buy time for your", "{@color_second}mining&r {@color_first}pass. You need a pass to", "{@color_first}mine in the caverns."
+        make gui slot 31 with clock named "{@color_second}Buy Pass" with lore " ", "{@color_first}Amount: {@color_second}%Information_MakeFancierTime({mining::pass_shop_amount::%{_uuid}%})%", "{@color_first}Cost: {@color_second}$%Information_MakeFancierNumber({mining::pass_shop_cost::%{_uuid}%})%":
+            close inventory of {_plr}
+            if Money_Get({_plr}) >= {mining::pass_shop_cost::%{_uuid}%}:
+                Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+                Money_Remove({_plr}, {mining::pass_shop_cost::%{_uuid}%})
+                send "{@message_prefix} You bought {@color_second}%Information_MakeFancierTime({mining::pass_shop_amount::%{_uuid}%})% {@color_first}of mining time for {@color_second}$%Information_MakeFancierNumber({mining::pass_shop_cost::%{_uuid}%})%{@color_first},. Enjoy!" to {_plr}
+                add {mining::pass_shop_amount::%{_uuid}%} to {mining::pass_of_player::%uuid of player%} if {mining::pass_of_player::%uuid of player%} is set
+                set {mining::pass_of_player::%uuid of player%} to {mining::pass_shop_amount::%{_uuid}%} if {mining::pass_of_player::%uuid of player%} is not set
+            else if Money_Get({_plr}) < {mining::pass_shop_cost::%{_uuid}%}:
+                Lib_PlaySound({_plr}, "ENTITY_VILLAGER_NO", 1)
+                send "{@message_prefix} {@color_error}You don't have enough money! You still need {@color_second}$%Information_MakeFancierNumber({mining::pass_shop_cost::%{_uuid}%} - Money_Get({_plr}))%{@color_error}!"
+    open last gui to {_plr} 
+
+# OPEN CRYSTALS INFORMATION GUI
+function Mining_OpenCrystalsGUI(plr: player):
+    create a gui with virtual chest with 3 rows named "{@color_third}Crystals Information":
+        loop 27 times:
+            make next gui slot with {@filler}
+        make gui slot 13 with enchanted book named "{@color_third}Crystals Information" with lore " ", "{@color_second}Crystals {@color_first}is a currency that you", "{@color_first}obtain from mining! You can use it", "{@color_first}in {@color_second}/crystalshop {@color_first}to get gen slots,", "{@color_first}sell multipliers and more!", " ", "{@color_fourth}Click me to go back.":
+            Mining_OpenMainGUI({_plr})
+    open last gui to {_plr}
+
+# OPEN PICKAXE SHOP GUI
+function Mining_OpenPickaxeShopGUI(plr: player):
+    create a gui with virtual chest with 3 rows named "{@color_third}Pickaxe Shop":
+        loop 27 times:
+            make next gui slot with {@filler}
+        make gui slot 13 with enchanted book named ""
+    open last gui to {_plr}
+
+# OPEN MAIN GUI
+function Mining_OpenMainGUI(plr: player):
+    create a gui with virtual chest with 3 rows named "{@color_third}Mining GUI":
+        loop 27 times:
+            make next gui slot with {@filler}
+        make gui slot 10 with clock named "{@color_third}Pass Shop" with lore " ", "{@color_first}Buy a {@color_second}Mining Pass&r {@color_first}or buy", "{@color_first}more time to your {@color_second}Mining Pass&r{@color_first}.", " ", "{@color_fourth}Click me to open the Pass Shop.":
+            Mining_OpenPassShopGUI({_plr})
+        make gui slot 13 with enchanted book named "{@color_third}Mining Information" with lore " ", "{@color_second}Mining {@color_first}is a feature on {@color_second}DawnGN{@color_first},", "{@color_first}That lets you mine for {@color_second}crystals&r{@color_first}!", "{@color_first}You need a {@color_second}Mining Pass&r {@color_first}and a", "{@color_second}Burrow's Pickaxe&r {@color_first}to mine in the", "{@color_first}caverns you need gear to fight", "{@color_first}other players and protect yourself", "{@color_first}from the {@color_second}Hostile Mobs&r{@color_first}.", " ", "{@color_fourth}Click me to view Crystals Information.":
+            Mining_OpenCrystalsGUI({_plr})
+        make gui slot 16 with shiny diamond pickaxe with no nbt named "{@color_third}Burrow's Pickaxe" with lore "{@color_first}Cost: {@color_second}$15k", " ", "{@color_first}Buy a {@color_second}Burrow's Pickaxe&r {@color_first}here, You", "{@color_first}need it to mine in the caverns.", "{@color_first}This pickaxe is upgradable by", "{@color_second}Right Clicking&r {@color_first}having the pickaxe", "{@color_first}in your hand.", " ", "{@color_fourth}Click me to buy a pickaxe.":
+            Mining_OpenPickaxeShopGUI({_plr})
+    open last gui to {_plr}
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+# MAIN NPC CLICK EVENT
+on npc right click:
+    event-number = {@main_npc}
+    if {mining::player_in_tutorial::%uuid of player%} = true:
+        Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1)
+        send subtitle "{@color_error}You can't do this right now!"
+        stop
+    if {mining::player_has_interacted::%uuid of player%} is not set:
+        Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 0.8)
+        set {mining::player_in_tutorial::%uuid of player%} to true
+        send "&r%nl%{@message_prefix} {@color_first}Hey! It looks like you discovered the {@color_second}mining&r {@color_first}feature!" to player
+        wait 4 second
+        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+        send "&r%nl%{@message_prefix} {@color_second}Mining&r {@color_first}gets you {@color_second}crystals, {@color_first}Which you can use to get crate keys, gen slots, and more, At {@color_second}/crystalshop." to player
+        wait 4 second
+        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+        send "&r%nl%{@message_prefix} {@color_first}The {@color_second}Burrow's Pickaxe&r {@color_first}is the tool required to be able to mine, It is upgradable by right clicking when you are holding one." to player
+        wait 4 second
+        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+        send "&r%nl%{@message_prefix} {@color_first}The mine contains 3 layers, The last layer has {@color_second}dangerous mobs&r {@color_first}that'll try to kill you! Killing these mobs, Though get you awesome loot, Like crystal boxes, etc." to player
+        wait 4 second
+        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+        send "&r%nl%{@message_prefix} {@color_first}Finally, PvP is enabled in the mines! Be careful, Make sure you are well prepared for combat! And have fun in the mines." to player
+        wait 4 second
+        Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 1)
+        send "&r%nl%{@message_prefix} {@color_second}Right Click&r {@color_first}me again to open the Mining GUI! I will give you a free 10 minute pass and the {@color_second}Burrow's Pickaxe&r {@color_first}to try out the mine!" to player
+        set {mining::player_in_tutorial::%uuid of player%} to false
+        set {mining::player_has_interacted::%uuid of player%} to true
+        stop
+    Mining_OpenMainGUI(player)
+
+# ENTERING / EXITING MINE REGIONS
+on region enter:
+    "%event-region%" contains "mines"
+    set {mining::last_location::%uuid of player%} to location of player
+    if {mining::pass_of_player::%uuid of player%} is not set:
+        cancel event
+        wait 1 tick
+        push player backwards at speed 0.8
+        push player upwards at speed 0.4
+        if {mining::player_notified::%uuid of player%} is not set:
+            set {mining::player_notified::%uuid of player%} to true
+            send subtitle "{@color_error}You don't have a active pass right now!" to player
+            Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1)
+            wait 3 second
+            delete {mining::player_notified::%uuid of player%}
+
+# PASS TIMER
+every second:
+    loop indices of {mining::pass_of_player::*}:
+        set {_player} to (loop-value parsed as an player)
+        remove 1 second from {mining::pass_of_player::%loop-value%}
+        if {mining::pass_of_player::%loop-value%} <= 0 seconds:
+            delete {mining::pass_of_player::%loop-value%}
+            Lib_PlaySound({_player}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} Your mining pass has expired!" to {_player}
+            teleport {_player} to {mining::last_location::%loop-value%}
+            delete {mining::last_location::%loop-value%}
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+
+# ---------------[ COMMANDS ]--------------- #

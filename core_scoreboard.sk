@@ -1,0 +1,113 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons: skBee
+# Last Updated: 11/21/20
+# Current Version: 1.0.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>
+    error_not_player: &c&l(!) &cOnly players can execute this command!
+    error_wrong_usage: &c&l(!) &cIncorrect Usage!%nl%&c&l(!)&cCorrect Usage: &a<arg>
+    error_not_correct_type: &c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+# SCOREBOARD UPDATE FUNCTION
+function Scoreboard_UpdateBoard(plr: player):
+    set {_upper} to "%{_plr}%" in uppercase
+    set {_uuid} to uuid of {_plr}
+    set line 15 of {_plr}'s scoreboard to " "
+    set line 14 of {_plr}'s scoreboard to "&2&l%{_upper}%"
+    set line 13 of {_plr}'s scoreboard to " &8&l| &fGens: &b0/40"
+    set line 12 of {_plr}'s scoreboard to " &8&l| &fMoney: &a$%Information_MakeFancierNumber(Money_Get({_plr}))%"
+    set line 11 of {_plr}'s scoreboard to " &8&l| &fCrystals: &d0✦"
+    set line 10 of {_plr}'s scoreboard to " &8&l| &fGrains: &e0✿"
+    set line 9 of {_plr}'s scoreboard to " "
+    if "%region at {_plr}%" contains "farming":
+        set line 8 of {_plr}'s scoreboard to "&6&lFARMING"
+        set line 7 of {_plr}'s scoreboard to " &8&l| &fPass: &e1h, 58m, 53s"
+        set line 6 of {_plr}'s scoreboard to " &8&l| &fBackpack: &e21/100"
+        set line 5 of {_plr}'s scoreboard to " &8&l| &fWorth: &e59✿"
+        stop
+    else if "%region at {_plr}%" contains "mines":
+        set line 8 of {_plr}'s scoreboard to "&5&lMINING"
+        set line 7 of {_plr}'s scoreboard to " &8&l| &fPass: &d%Information_MakeFancierTime({mining::pass_of_player::%{_uuid}%}) ? ""No Pass""%"
+        set line 6 of {_plr}'s scoreboard to " &8&l| &fBackpack: &d21/100"
+        set line 5 of {_plr}'s scoreboard to " &8&l| &fWorth: &d59✿"
+        stop
+    else:
+        set line 8 of {_plr}'s scoreboard to "&2&lSERVER"
+        set line 7 of {_plr}'s scoreboard to " &8&l| &fOnline: &a%number of all players%/75"
+        set line 6 of {_plr}'s scoreboard to " &8&l| &fLogins: &a%number of all offline players%"
+        set line 5 of {_plr}'s scoreboard to " &8&l| &fTPS: &a%tps from the last minute%"
+        stop
+# --------------[ FUNCTIONS ]-------------- #
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+    set {scoreboard::title::*} to "&f&lDAWNGN", "&a&lD&f&lAWNGN", "&2&lD&a&lA&f&lWNGN", "&2&lDA&a&lW&f&lNGN", "&2&lDAW&a&lN&f&lGN", "&2&lDAWN&a&lG&f&lN", "&2&lDAWNG&a&lN", "&2&lDAWNGN", "&a&lD&2&lAWNGN", "&f&lD&a&lA&2&lWNGN", "&f&lDA&a&lW&2&lNGN", "&f&lDAW&a&lN&2&LGN", "&f&lDAWN&a&lG&2&lN", "&f&lDAWNG&a&lN" and "&f&lDAWNGN"
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+# DO SCOREBOARD ANIMATION & UPDATE
+every 28 ticks:
+    loop all players:
+        loop {scoreboard::title::*}:
+            set title of loop-player's scoreboard to "   %loop-value-2% &8| &aSeason I   "
+            wait 2 ticks
+        Scoreboard_UpdateBoard(loop-player)
+        wait 1 tick
+# ---------------[ EVENTS ]--------------- #

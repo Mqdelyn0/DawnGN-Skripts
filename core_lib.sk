@@ -1,0 +1,306 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons: I don't think there's any.
+# Last Updated: 11/21/20
+# Current Version: 0.5
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>
+    error_not_player: &c&l(!) &cOnly players can execute this command!
+    error_wrong_usage: &c&l(!) &cIncorrect Usage!%nl%&c&l(!)&cCorrect Usage: &a<arg>
+    error_not_correct_type: &c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray glass stained pane named " "
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+# HOLOGRAMS API
+function Holograms_CreateHologram(id: string, lines: string, loc: location, inverse: boolean = false):
+    if {lib::holograms::%{_id}%::*} is not set:
+        set {_splitted_lines::*} to split {_lines} at "|"
+        if {_inverse} = true:
+            set {_splitted_lines::*} to reversed {_splitted_lines::*}
+        set {_offset} to 0
+        set {lib::holograms::%{_id}%::inverse} to {_inverse}
+        set {lib::holograms::%{_id}%::location} to {_loc}
+        set {lib::holograms::%{_id}%::is_loaded} to false
+        set {_loops} to 0
+        loop {_splitted_lines::*}:
+            add 1 to {_loops}
+            set {lib::holograms::%{_id}%::offset} to {_offset}
+            set {lib::holograms::%{_id}%::lines::%{_loops}%} to loop-value
+        Holograms_LoadHologram({_id})
+
+function Holograms_DeleteHologram(id: string):
+    if {lib::holograms::%{_id}%::*} is set:
+        set {_offset} to 0
+        set {_inverse} to {lib::holograms::%{_id}%::inverse}
+        set {_location} to {lib::holograms::%{_id}%::location}
+        loop {lib::holograms::%{_id}%::lines::*}:
+            set {_offset} to {_offset} - 0.25 if {_inverse} = true
+            set {_offset} to {_offset} + 0.25 if {_inverse} = false
+            kill all entities in radius 0.01 of location {_offset} below {_location} where [input = armor stand]
+        delete {lib::holograms::%{_id}%::*}
+
+function Holograms_SetLine(id: string, line: integer, new_line: string):
+    if {lib::holograms::%{_id}%::*} is set:
+        loop {lib::holograms::%{_id}%::lines::*}:
+            set {_loop_line} to loop-index parsed as an integer
+            if {_loop_line} = {_line}:
+                set {lib::holograms::%{_id}%::lines::%loop-index%} to {_new_line}
+                Holograms_UnloadHologram({_id})
+                wait 1 tick
+                Holograms_LoadHologram({_id})
+
+function Holograms_Insertline(id: string, line: integer, new_line: string):
+    if {lib::holograms::%{_id}%::*} is set:
+        set {_lines::*} to {lib::holograms::%{_id}%::lines::*}
+        set {_loops} to 0
+        loop {_lines::*}:
+            add 1 to {_loops}
+            if {_loops} = {_line}:
+                add {_new_line} to {_new_lines::*}
+            add loop-value to {_new_lines::*}
+        set {lib::holograms::%{_id}%::lines::*} to {_new_lines::*}
+        Holograms_UnloadHologram({_id})
+        wait 1 tick
+        Holograms_LoadHologram({_id})
+
+function Holograms_RemoveLine(id: string, line: integer):
+    if {lib::holograms::%{_id}%::is_loaded} is true:
+        if {lib::holograms::%{_id}%::lines::%{_line}%} is set:
+            set {lib::holograms::%{_id}%::is_loaded} to false
+            set {_offset} to 0
+            set {_inverse} to {lib::holograms::%{_id}%::inverse}
+            set {_location} to {lib::holograms::%{_id}%::location}
+            loop {lib::holograms::%{_id}%::lines::*}:
+                set {_offset} to {_offset} - 0.25 if {_inverse} = true
+                set {_offset} to {_offset} + 0.25 if {_inverse} = false
+                kill all entities in radius 0.01 of location {_offset} below {_location} where [input = armor stand]
+            delete {lib::holograms::%{_id}%::lines::%{_line}%}
+            set {lib::holograms::%{_id}%::lines::*} to {lib::holograms::%{_id}%::lines::*}
+            Holograms_UnloadHologram({_id})
+            wait 1 tick
+            Holograms_LoadHologram({_id})
+
+function Holograms_LoadAllHolograms():
+    Holograms_UnloadAllHolograms()
+    wait 1 tick
+    loop indices of {lib::holograms::*}:
+        set {_id} to loop-value
+        set {_offset} to 0
+        set {_inverse} to {lib::holograms::%{_id}%::inverse}
+        set {_location} to {lib::holograms::%{_id}%::location}
+        if {lib::holograms::%{_id}%::is_loaded} is false:
+            loop {lib::holograms::%{_id}%::lines::*}:
+                set {_offset} to {_offset} - 0.25 if {_inverse} = true
+                set {_offset} to {_offset} + 0.25 if {_inverse} = false
+                if loop-value-2 != "{empty}":
+                    spawn 1 armor stand at location {_offset} below {_location}
+                    set {_stand} to the last spawned armor stand
+                    add "{CustomNameVisible:1,Small:1,Invisible:1,Invulnerable:1,NoGravity:1}" to nbt of {_stand}
+                    set the display name of {_stand} to colored loop-value-2
+            set {lib::holograms::%{_id}%::is_loaded} to true
+
+function Holograms_UnloadAllHolograms():
+    loop indices of {lib::holograms::*}:
+        set {_id} to loop-value
+        set {_offset} to 0
+        set {_inverse} to {lib::holograms::%{_id}%::inverse}
+        set {_location} to {lib::holograms::%{_id}%::location}
+        if {lib::holograms::%{_id}%::is_loaded} is true:
+            loop {lib::holograms::%{_id}%::lines::*}:
+                set {_offset} to {_offset} - 0.25 if {_inverse} = true
+                set {_offset} to {_offset} + 0.25 if {_inverse} = false
+                kill all entities in radius 0.01 of location {_offset} below {_location} where [input = armor stand]
+            set {lib::holograms::%{_id}%::is_loaded} to false
+
+function Holograms_LoadHologram(id: string):
+    Holograms_UnloadHologram({_id})
+    wait 1 tick
+    if {lib::holograms::%{_id}%::*} is set:
+        set {_offset} to 0
+        set {_inverse} to {lib::holograms::%{_id}%::inverse}
+        set {_location} to {lib::holograms::%{_id}%::location}
+        if {lib::holograms::%{_id}%::is_loaded} is false:
+            loop {lib::holograms::%{_id}%::lines::*}:
+                set {_offset} to {_offset} - 0.25 if {_inverse} = true
+                set {_offset} to {_offset} + 0.25 if {_inverse} = false
+                if loop-value != "{empty}":
+                    spawn 1 armor stand at location {_offset} below {_location}
+                    set {_stand} to the last spawned armor stand
+                    add "{CustomNameVisible:1,Small:1,Invisible:1,Invulnerable:1,NoGravity:1}" to nbt of {_stand}
+                    set the display name of {_stand} to colored loop-value
+            set {lib::holograms::%{_id}%::is_loaded} to true
+
+function Holograms_UnloadHologram(id: string):
+    if {lib::holograms::%{_id}%::*} is set:
+        set {_offset} to 0
+        set {_inverse} to {lib::holograms::%{_id}%::inverse}
+        set {_location} to {lib::holograms::%{_id}%::location}
+        if {lib::holograms::%{_id}%::is_loaded} is true:
+            loop {lib::holograms::%{_id}%::lines::*}:
+                set {_offset} to {_offset} - 0.25 if {_inverse} = true
+                set {_offset} to {_offset} + 0.25 if {_inverse} = false
+                kill all entities in radius 0.01 of location {_offset} below {_location} where [input = armor stand]
+            set {lib::holograms::%{_id}%::is_loaded} to false
+
+# BROADCAST API
+function Lib_Broadcast(msg: string):
+    loop all players:
+        Lib_PlaySound(loop-player, "BLOCK_NOTE_BLOCK_PLING", 0.9)
+        send {_msg} to loop-player
+        
+# SOUND API
+function Lib_PlaySound(plr: player, sound: string, pitch: number):
+    {_sound} != "none"
+    play sound {_sound} at pitch {_pitch} to {_plr}
+
+# ECONOMIES API
+function Money_Get(plr: player) :: number:
+    set {_uuid} to uuid of {_plr}
+    return {lib::balance_money::%{_uuid}%} ? 0
+
+function Money_Set(plr: player, new_bal: number):
+    set {_uuid} to uuid of {_plr}
+    set {lib::balance_money::%{_uuid}%} to {_new_bal}
+
+function Money_Add(plr: player, add_bal: number):
+    {_add_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    add {_add_bal} to {lib::balance_money::%{_uuid}%}
+
+function Money_Remove(plr: player, take_bal: number):
+    {_take_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    remove {_add_bal} from {lib::balance_money::%{_uuid}%}
+
+function Crystals_Get(plr: player) :: number:
+    set {_uuid} to uuid of {_plr}
+    return {lib::balance_crystals::%{_uuid}%} ? 0
+
+function Crystals_Set(plr: player, new_bal: number):
+    set {_uuid} to uuid of {_plr}
+    set {lib::balance_crystals::%{_uuid}%} to {_new_bal}
+
+function Crystals_Add(plr: player, add_bal: number):
+    {_add_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    add {_add_bal} to {lib::balance_crystals::%{_uuid}%}
+
+function Crystals_Remove(plr: player, take_bal: number):
+    {_take_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    remove {_add_bal} from {lib::balance_crystals::%{_uuid}%}
+
+function Grains_Get(plr: player) :: number:
+    set {_uuid} to uuid of {_plr}
+    return {lib::balance_grains::%{_uuid}%} ? 0
+
+function Grains_Set(plr: player, new_bal: number):
+    set {_uuid} to uuid of {_plr}
+    set {lib::balance_grains::%{_uuid}%} to {_new_bal}
+
+function Grains_Add(plr: player, add_bal: number):
+    {_add_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    add {_add_bal} to {lib::balance_grains::%{_uuid}%}
+
+function Grains_Remove(plr: player, take_bal: number):
+    {_take_bal} > 0
+    set {_uuid} to uuid of {_plr}
+    remove {_add_bal} from {lib::balance_grains::%{_uuid}%}
+
+# MAKE TIME LOOK BETTER
+function Information_MakeFancierTime(time: timespan) :: string:
+    set {_fancier_time} to "%{_time}%"
+    replace " seconds" in {_fancier_time} with "s"
+    replace " second" in {_fancier_time} with "s"
+    replace " minutes" in {_fancier_time} with "m"
+    replace " minute" in {_fancier_time} with "m"
+    replace " weeks" in {_fancier_time} with "w"
+    replace " week" in {_fancier_time} with "w"
+    replace " months" in {_fancier_time} with "mo"
+    replace " month" in {_fancier_time} with "mo"
+    replace "and" in {_fancier_time} with " "
+    return {_fancier_time}
+
+function Information_MakeFancierNumber(n: number) :: string:
+    set {_l::*} to split "k|M|B|T|Qn|Qi|Sx" at "|"
+    set {_i} to min(floor(log({_n})/3), size of {_l::*})
+    return "%{_n}%" if {_i} <= 0
+    set {_i2} to 1000^{_i}
+    return "%{_n}/{_i2}%%{_l::%{_i}%}%"
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE & HOLOGRAMS LOAD / UNLOAD
+on load:
+    Holograms_LoadAllHolograms()
+    set {lib::server_restarted} to false
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+        
+on unload:
+    Holograms_UnloadAllHolograms()
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+on tab complete of "/sk" or "/skript":
+    set tab completions for position 1 to "reload", "enable", "disable", "update" and "help"
+    if tab arg-1 = "reload" or "disable":
+        set tab completions for position 2 to enabled scripts
+    if tab arg-1 = "enable":
+        set tab completions for position 2 to disabled scripts
+# ---------------[ EVENTS ]--------------- #

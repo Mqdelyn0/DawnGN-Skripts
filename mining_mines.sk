@@ -1,0 +1,332 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons: TuSKe
+# Last Updated: 11/21/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+# MINE EXISTS CHECK
+function Mines_MineExists(id: string) :: boolean:
+    return true if {mines::created_mines::%{_id}%::*} is set, else false
+
+# ADD BLOCK TO MINE
+function Mines_AddBlock(id: string, block: itemtype, chance: integer):
+    if {mines::created_mines::%{_id}%::*} is set:
+        set {_edited_block} to "%{_block}%"
+        replace all "southward ", "northward ", "westward ", "eastward " in {_edited_block} with ""
+        replace all " " in {_edited_block} with "_"
+        set {mines::created_mines::%{_id}%::blocks::%{_edited_block}%::chance} to {_chance}
+
+# REMOVE BLOCK FROM MINE
+function Mines_RemvoeBlock(id: string, block: itemtype):
+    if {mines::created_mines::%{_id}%::*} is set:
+        set {_edited_block} to "%{_block}%"
+        replace all "southward ", "northward ", "westward ", "eastward " in {_edited_block} with ""
+        replace all " " in {_edited_block} with "_"
+        if {mines::created_mines::%{_id}%::blocks::%{_edited_block}%::*} is set:
+            delete {mines::created_mines::%{_id}%::blocks::%{_edited_block}%::*}
+
+# RESET A SPECIFIC MINE 
+function Mines_ResetMine(id: string):
+    if {mines::created_mines::%{_id}%::*} is set:
+        Lib_Broadcast("&r%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}is resetting! This might cause lag.%nl%&r")
+        if {mines::created_mines::%{_id}%::blocks_to_reset::*} is not set:
+            loop all blocks within bound with id "mines_%{_id}%":
+                loop-block = bedrock
+                set block at loop-block to stone
+                add location of loop-block to {mines::created_mines::%{_id}%::blocks_to_reset::*} if {mines::created_mines::%{_id}%::blocks_to_reset::*} does not contain location of loop-block
+                set {_chance} to {@high_lag_protection}
+                chance of {_chance}%:
+                    wait 1 tick
+        loop indices of {mines::created_mines::%{_id}%::blocks::*}:
+            set {_chances::%loop-value%} to {mines::created_mines::%{_id}%::blocks::%loop-value%::chance}
+        set {_size} to size of {mines::created_mines::%{_id}%::blocks_to_reset::*}
+        loop {mines::created_mines::%{_id}%::blocks_to_reset::*}:
+            block at loop-value = bedrock or stone
+            add loop-value to {_locations_to_randomize::*}
+            set {_chance} to {@high_lag_protection}
+            chance of {_chance}%:
+                wait 1 tick
+        loop indices of {_chances::*}:
+            set {_needed_blocks_to_set::%loop-value%} to round({_size} * ({_chances::%loop-value%} / 100))
+        set {_loops} to 0
+        set {_on_going} to false
+        set {_setted_blocks} to 0
+        loop size of {_locations_to_randomize::*} times:
+            set {_loc} to random element out of {_locations_to_randomize::*}
+            remove {_loc} from {_locations_to_randomize::*}
+            if {_on_going} = false:
+                set {_current_block} to random element out of (indices of {_needed_blocks_to_set::*})
+                set {_current_amount_needed} to {_needed_blocks_to_set::%{_current_block}%}
+                if {_current_block} or {_current_amount_needed} is not set:
+                    stop loop
+                replace "_" in {_current_block} with " "
+                set {_parsed_block} to {_current_block} parsed as an itemtype
+                set {_on_going} to true
+            if {_on_going} = true:
+                add 1 to {_loops}
+                set block at {_loc} to {_parsed_block}
+                add 1 to {_setted_blocks} if block at {_loc} = {_parsed_block}
+                if {_loops} >= {_current_amount_needed}:
+                    replace " " in {_current_block} with "_"
+                    delete {_needed_blocks_to_set::%{_current_block}%}
+                    delete {_current_block}
+                    delete {_current_amount_needed}
+                    set {_on_going} to false
+                    set {_loops} to 0
+            set {_chance} to {@high_lag_protection}
+            chance of {_chance}%:
+                wait 1 tick
+        Lib_Broadcast("&r%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}has resetted {@color_second}%{_setted_blocks}% {@color_first}blocks! Visit it at {@color_second}/warps{@color_first}.%nl%&r")
+
+# BOUNDS FUNCTIONS
+function Mines_CreateBounds(id: string, pos_1: location, pos_2: location):
+    create a new bound with id "mines_%{_id}%" between {_pos_1} and {_pos_2}
+
+function Mines_DeleteBounds(id: string):
+    delete bound with id "mines_%{_id}%"
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+# REGIONWAND LEFT CLICK / RIGHT CLICK EVENT
+on left click with blaze rod:
+    set {_tag} to "type" tag of nbt of player's tool
+    {_tag} = "mine_region_wand"
+    cancel event
+    distance between location of player's targeted block and location of player < 5
+    targeted block of player != air
+    set {mines::region_wand_data::pos_1::%uuid of player%} to location of player's targeted block
+
+# REGIONWAND LEFT CLICK / RIGHT CLICK EVENT
+on right click with blaze rod:
+    set {_tag} to "type" tag of nbt of player's tool
+    {_tag} = "mine_region_wand"
+    cancel event
+    distance between location of player's targeted block and location of player < 5
+    targeted block of player != air
+    set {mines::region_wand_data::pos_2::%uuid of player%} to location of player's targeted block
+
+on block break:
+    set {_bounds::*} to bounds at event-block
+    "%{_bounds::1}%" contains "mines"
+    set {_str} to "%{_bounds::1}%"
+    set {_mine::*} to {_str} split at "_"
+    cancel drops
+    set {_edited_block} to "%event-block%"
+    replace all "southward ", "northward ", "westward ", "eastward " in {_edited_block} with ""
+    replace all " " in {_edited_block} with "_"
+    if {mines::created_mines::%{_mine::2}%::blocks::%{_edited_block}%::*} is not set:
+        cancel event
+        stop
+    set event-block to bedrock
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+# MAIN SKRIPT COMMAND
+command /mines [<string>] [<string>] [<string>] [<string>]:
+    trigger:
+        if arg-1 = "create":
+            if sender is console:
+                send "{@error_not_player}" to sender
+                stop
+            if player does not have permission "mines.create_mine":
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_no_permission}"
+                replace "<arg>" in {_message} with "mines.create_mine"
+                send {_message} to player
+                stop
+            if arg-2 is not set:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_wrong_usage}"
+                replace "<arg>" in {_message} with "/mines create coal"
+                send {_message} to player
+                stop
+            if Mines_MineExists(arg-2) = true:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_second}%arg-2% {@color_first}is already made!" to player
+                stop
+            set {mines::created_mines::%arg-2%::reset_time} to 120 seconds
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_second}%arg-2% {@color_first}was made! Set it's region by {@color_second}/mines regionwand {@color_first}and execute {@color_second}/mines panel %arg-2%" to player
+            stop
+        else if arg-1 = "delete":
+            if sender is console:
+                send "{@error_not_player}" to sender
+                stop
+            if player does not have permission "mines.delete":
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_no_permission}"
+                replace "<arg>" in {_message} with "mines.delete"
+                send {_message} to player
+                stop
+            if arg-2 is not set:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0 )
+                set {_message} to "{@error_wrong_usage}"
+                replace "<arg>" in {_message} with "/mines delete coal"
+                send {_message} to player
+                stop
+            if Mines_MineExists(arg-2) = false:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_second}%arg-2% {@color_error}isn't a mine!" to player
+                stop
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            delete {mines::created_mines::%arg-2%::*}
+            send "{@message_prefix} {@color_second}%arg-2% {@color_first}has been deleted!" to player
+            Mines_DeleteBounds(arg-2)
+        else if arg-1 = "reset":
+            if arg-2 is not set:
+                Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_wrong_usage}"
+                replace "<arg>" in {_message} with "/mines reset coal"
+                send {_message} to sender
+                stop
+            if Mines_MineExists(arg-2) = false:
+                Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_second}%arg-2% {@color_error}isn't a mine!" to sender
+                stop
+            Lib_PlaySound(sender, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_first}You resetted {@color_second}%arg-2%{@color_first}!" to sender
+            wait 5 seconds
+            Mines_ResetMine(arg-2)
+        else if arg-1 = "resetall":
+            Lib_PlaySound(sender, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_first}You resetted every mine!" to sender
+            wait 5 seconds
+            loop indices of {mines::created_mines::*}:
+                Mines_ResetMine(loop-value)
+                wait 10 seconds
+        else if arg-1 = "regionwand":
+            if sender is console:
+                send "{@error_not_player}" to sender
+                stop
+            if player does not have permission "mines.region_wand":
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_no_permission}"
+                replace "<arg>" in {_message} with "mines.region_wand"
+                send {_message} to player
+                stop
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_first}You got a regionwand. Left click to set pos-1, Right click to set pos-2." to player
+            give 1 of shiny blaze rod named "{@color_second}Mines Region Wand" with nbt "{type:""mine_region_wand""}" to player
+        else if arg-1 = "setregion":
+            if sender is console:
+                send "{@error_not_player}" to sender
+                stop
+            if player does not have permission "mines.panel":
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_no_permission}"
+                replace "<arg>" in {_message} with "mines.panel"
+                send {_message} to player
+                stop
+            if arg-2 is not set:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_wrong_usage}"
+                replace "<arg>" in {_message} with "/mines setregion coal"
+                send {_message} to player
+                stop
+            if Mines_MineExists(arg-2) = false:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_second}%arg-2% {@color_first}isn't a mine!" to player
+                stop
+            if {mines::region_wand_data::pos_1::%uuid of player%} or {mines::region_wand_data::pos_2::%uuid of player%} is not set:
+                Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_error}You need to select a region first. {@color_fourth}({@color_second}/mines regionwand{@color_fourth})"
+            Mines_CreateBounds(arg-2, {mines::region_wand_data::pos_1::%uuid of player%}, {mines::region_wand_data::pos_2::%uuid of player%})
+        else:
+            Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 1.0)
+            create a gui with virtual chest with 3 rows named "{@color_third}Mines Help":
+                loop 27 times:
+                    make next gui slot with {@filler}
+                make gui slot 10 with enchanted book named "{@color_third}/mines help" with lore "{@color_first}(No Permission)", " ", "{@color_first}Executing this command will", "{@color_first}show you the Help GUI."
+                make gui slot 11 with enchanted book named "{@color_third}/mines create (Mine ID) (Mine Name)" with lore "{@color_first}(mines.create_mine)", " ", "{@color_first}Executing this command will create", "{@color_first}a mine for you, After the creation,", "{@color_first}You may execute {@color_second}/mines panel (Mine ID) ","{@color_first}To edit the mine's ores, reset times, etc.", " ", "{@color_second}Exmaple Usage:", "{@color_fourth}¬ {@color_first}/mines create coal Coal_Mine"
+                make gui slot 12 with enchanted book named "{@color_third}/mines delete (Mine ID)" with lore "{@color_first}(mines.delete_mine)", " ", "{@color_first}Executing this command will delete", "{@color_first}a mine for you, This is irreversible!", "{@color_second}Exmaple Usage:", "{@color_fourth}¬ {@color_first}/mines delete coal"
+                make gui slot 13 with enchanted book named "{@color_third}/mines reset (Mine ID)" with lore "{@color_first}(mines.reset)", " ", "{@color_first}Executing this command will", "{@color_first}reset your selected mine.", " ", "{@color_second}Exmaple Usage:", "{@color_fourth}¬ {@color_first}/mines reset coal"
+                make gui slot 14 with enchanted book named "{@color_third}/mines resetall" with lore "{@color_first}(mines.reset_all)", " ", "{@color_first}Executing this command will reset", "{@color_first}all the times!. This may cause lag.", " ", "{@color_second}Exmaple Usage:", "{@color_fourth}¬ {@color_first}/mines resetall"
+                make gui slot 15 with enchanted book named "{@color_third}/mines regionwand" with lore "{@color_first}(mines.region_wand)", " ", "{@color_first}Executing this command will give", "{@color_first}you a wand to make a region."
+                make gui slot 16 with enchanted book named "{@color_third}/mines setregion (Mine ID)" with lore "{@color_first}(mines.set_region)", " ", "{@color_first}Executing this command will set", "{@color_first}the region of a mine.", " ", "{@color_second}Exmaple Usage:", "{@color_fourth}¬ {@color_first}/mines setregion coal"
+            open last gui to player
+
+# MAIN SKRIPT COMMAND'S TAB COMPLETION
+on tab complete of "/mines":
+    set tab completions for position 1 to "help", "create", "delete", "reset", "resetall", "regionwand", "setregion"
+    if tab arg-1 = "delete" or "reset" or "setregion":
+        set tab completions for position 2 to indices of {mines::created_mines::*}
+# ---------------[ COMMANDS ]--------------- #
