@@ -271,6 +271,14 @@ function Information_MakeFancierNumber(n: number) :: string:
     return "%{_n}%" if {_i} <= 0
     set {_i2} to 1000^{_i}
     return "%{_n}/{_i2}%%{_l::%{_i}%}%"
+    
+function Information_ProgressBar(int: integer, max: integer, barsize: integer) :: string:
+    stop if {_int} < 0
+    stop if {_max} < 0
+    stop if {_barsize} < 1
+    loop {_barsize} times:
+        set {_bar} to "%{_bar} ? """"%|"
+    return "&8&l[&a%((first floor({_barsize} * ({_int}/{_max})) characters of {_bar}) ? """")%&c%(last {_barsize} - floor({_barsize} * ({_int}/{_max})) characters of {_bar}) ? """"%&8&l]"
 # --------------[ FUNCTIONS ]-------------- #
 
 
