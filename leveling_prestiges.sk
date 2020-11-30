@@ -97,7 +97,7 @@ command /prestige [<text>]:
         create a gui with virtual chest with 3 rows named "&9Prestige GUI":
             loop 54 times:
                 make next gui slot with {@filler}
-            make gui slot 13 with emerald named "&aPrestige":
+            make gui slot 13 with emerald named "&aPrestige" with lore "&r", "&7Click here to confirm prestiging.", "&r":
                 if {leveling::current_level::%player's uuid%} >= 100*{leveling::current_prestige::%player's uuid%}:
                     add 1 to {leveling::current_prestige::%player's uuid%}
                     set {leveling::current_exp::%player's uuid%} to 0
@@ -115,10 +115,11 @@ command /prestige [<text>]:
 
 command /rebirth [<text>]:
     trigger:
-        create a gui with virtual crafting table named "&dRebirth GUI":
+        create a gui with virtual workbench named "&dRebirth GUI":
             loop 54 times:
                 make next gui slot with {@filler}
-            make gui slot 4 with nether star named "&aConfirm Rebirth" with lore "&d&lALL REBIRTH PERKS:", "&d&l• &f+5x Multiplier", "&d&l• &f+1 Rebirth token", "&d&l• &f1 Rebirth key", "&r", "&d&lYOU WILL LOSE:", "&d&l• &fAll your money", "&d&l• &f+All your prestiges", "&d&l• &f+All your current levels", "&r", "&d&lREQUIREMENTS:", "&d&l• &fPrestige 100" and "&d&l• &f$50M":
+            make gui slot 10 with air 
+            make gui slot 5 with nether star named "&aConfirm Rebirth" with lore "&r", "&d&lALL REBIRTH PERKS:", "&d&l• &f+5x Multiplier", "&d&l• &f+1 Rebirth token", "&d&l• &f1 Rebirth key", "&r", "&d&lYOU WILL LOSE:", "&d&l• &fAll your money", "&d&l• &fAll your prestiges", "&d&l• &fAll your current levels", "&r", "&d&lREQUIREMENTS:", "&d&l• &fPrestige 100" and "&d&l• &f$50M":
                 if {leveling::current_prestige::%player's uuid%} >= 100:
                     if Money_Get(player) >= 50000000:
                         set {leveling::current_exp::%player's uuid%} to 0
