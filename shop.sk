@@ -1,0 +1,160 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: ¬‿¬ GekkeSchaap#0001
+# Discord Server: https://discord.gg/bKwWyKM
+# Minecraft User: GekkeSchaap
+# Github: https://github.com/GekkeSchaap
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons:
+# Last Updated: 11/17/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+function buyItem(plr: player, cost: number, amount: number, item: itemtype):
+    set {_uuid} to uuid of {_plr}
+    if {_amount} > 0:
+        send "{@message_prefix} {@color_error}The amount has to be more than 1." to {_plr}
+        stop
+    if Money_Get({_plr}) > ({_cost} * {_amount}):
+        Money_Remove({_plr}, {_cost} * {_amount})
+        give {_amount} of {_item} to {_plr}
+        set {_message} to "{@message_prefix} {@color_first}You bought {@color_second}x%{_amount}% {@color_second}%{_item}%"
+        replace " item" in {_message} with ""
+        send {_message} to {_plr}
+    else:
+        set {_message} to "{@message_prefix} {@color_first}You don't have enough for {@color_second}x%{_amount}% {@color_second}%{_item}%"
+        replace " item" in {_message} with ""
+        send {_message} to {_plr}
+
+function buyItemAmount(plr: player, cost: number, item: itemtype):
+    set {_uuid} to uuid of {_plr}
+    set {shop::itemAmount::%{_uuid}%} to 0
+    set {_guiName} to "{@message_prefix} Buying %{_item}%"
+    replace " item" in {_guiName} with ""
+    create a gui with virtual chest with 5 rows named {_guiName}:
+        loop 54 times:
+            make next gui slot with {@filler}
+        make gui slot 10 with emerald block named "&aAdd 1":
+            add 1 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 11 with emerald block named "&aAdd 16":
+            add 16 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 12 with emerald block named "&aAdd 32":
+            add 32 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 13 with emerald block named "&aAdd 64":
+            add 64 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 14 with emerald block named "&aAdd 128":
+            add 128 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 28 with emerald block named "&cRemove 1":
+            remove 1 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 29 with emerald block named "&cRemove 16":
+            remove 16 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 30 with emerald block named "&cRemove 32":
+            remove 32 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 31 with emerald block named "&cRemove 64":
+            remove 64 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 32 with emerald block named "&cRemove 128":
+            remove 128 to {shop::itemAmount::%{_uuid}%}
+            make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+                buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+        make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
+            buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+        
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+
+# ---------------[ COMMANDS ]--------------- #
