@@ -60,9 +60,9 @@ options:
 
 # --------------[ FUNCTIONS ]-------------- #
 
-function buyItem(plr: player, cost: number, amount: number, item: itemtype):
+function buyItem(plr: player, cost: number, amount: integer, item: itemtype):
     set {_uuid} to uuid of {_plr}
-    if {_amount} > 0:
+    if {_amount} <= 0:
         send "{@message_prefix} {@color_error}The amount has to be more than 1." to {_plr}
         stop
     if Money_Get({_plr}) > ({_cost} * {_amount}):
@@ -76,24 +76,18 @@ function buyItem(plr: player, cost: number, amount: number, item: itemtype):
         replace " item" in {_message} with ""
         send {_message} to {_plr}
 
-function sellItem(plr: player, cost: number, amount: number, item: itemtype):
+function sellItem(plr: player, cost: number, amount: integer, item: itemtype):
     set {_uuid} to uuid of {_plr}
-    if {_amount} > 0:
+    if {_amount} <= 0:
         send "{@message_prefix} {@color_error}The amount has to be more than 1." to {_plr}
         stop
-    if inventory of {_plr} contains {_item}:
-        set {_itemAmount} to amount of {_item} in inventory of {_plr}
-        if {_itemAmount} >= {_amount}:
-            remove {_amount} of {_item} from inventory of {_plr}
-            Money_Add({_plr}, {_cost} * {_amount})
-            set {_message} to "{@message_prefix} {@color_first}You sold {@color_second}x%{_amount}% {@color_second}%{_item}% {@color_first}for {@color_second}$%{_cost}%"
-            replace " item" in {_message} with ""
-            send {_message} to {_plr}
-            stop
-        else:
-            set {_message} to "{@message_prefix} {@color_first}You don't have {@color_second}%{_item}% {@color_first}in your inventory"
-            replace " item" in {_message} with ""
-            send {_message} to {_plr}
+    if {_plr}'s inventory contains "%{_amount}% of %{_item}%" parsed as itemtype:
+        remove {_amount} of {_item} from {_plr}'s inventory
+        Money_Add({_plr}, {_cost} * {_amount})
+        set {_message} to "{@message_prefix} {@color_first}You sold {@color_second}x%{_amount}% {@color_second}%{_item}% {@color_first}for {@color_second}$%{_cost} * {_amount}%"
+        replace " item" in {_message} with ""
+        send {_message} to {_plr}
+        stop
     else:
         set {_message} to "{@message_prefix} {@color_first}You don't have {@color_second}%{_item}% {@color_first}in your inventory"
         replace " item" in {_message} with ""
@@ -123,29 +117,29 @@ function buyItemAmount(plr: player, cost: number, item: itemtype, amount: intege
         make gui slot 14 with emerald block named "&aAdd 128":
             add 128 to {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 28 with emerald block named "&cRemove 1":
-            remove 1 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 28 with redstone block named "&cRemove 1":
+            remove 1 from {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 29 with emerald block named "&cRemove 16":
-            remove 16 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 29 with redstone block named "&cRemove 16":
+            remove 16 from {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 30 with emerald block named "&cRemove 32":
-            remove 32 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 30 with redstone block named "&cRemove 32":
+            remove 32 from {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 31 with emerald block named "&cRemove 64":
-            remove 64 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 31 with redstone block named "&cRemove 64":
+            remove 64 from {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 32 with emerald block named "&cRemove 128":
-            remove 128 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 32 with redstone block named "&cRemove 128":
+            remove 128 from {shop::itemAmount::%{_uuid}%}
             buyItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
         make gui slot 25 with nametag named "&a&lCONFIRM PURCHASE" with lore "&7Click here to confirm the purchase" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
-            buyItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+            buyItem({_plr}, {_cost}, {_amount}, {_item})
     open last gui to {_plr}
 
 function sellItemAmount(plr: player, cost: number, item: itemtype, amount: integer = 0, recall: boolean = false):
     set {_uuid} to uuid of {_plr}
     Lib_PlaySound({_plr}, "ENTITY.EXPERIENCE_ORB.PICKUP", 1.0) if {_recalled} = false
-    set {_guiName} to "{@message_prefix} Buying %{_item}%"
+    set {_guiName} to "{@message_prefix} Selling %{_item}%"
     set {shop::itemAmount::%{_uuid}%} to {_amount}
     replace " item" in {_guiName} with ""
     create a gui with virtual chest with 5 rows named {_guiName}:
@@ -166,30 +160,34 @@ function sellItemAmount(plr: player, cost: number, item: itemtype, amount: integ
         make gui slot 14 with emerald block named "&aAdd 128":
             add 128 to {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 28 with emerald block named "&cRemove 1":
-            remove 1 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 28 with redstone block named "&cRemove 1":
+            remove 1 from {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 29 with emerald block named "&cRemove 16":
-            remove 16 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 29 with redstone block named "&cRemove 16":
+            remove 16 from {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 30 with emerald block named "&cRemove 32":
-            remove 32 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 30 with redstone block named "&cRemove 32":
+            remove 32 from {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 31 with emerald block named "&cRemove 64":
-            remove 64 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 31 with redstone block named "&cRemove 64":
+            remove 64 from {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
-        make gui slot 32 with emerald block named "&cRemove 128":
-            remove 128 to {shop::itemAmount::%{_uuid}%}
+        make gui slot 32 with redstone block named "&cRemove 128":
+            remove 128 from {shop::itemAmount::%{_uuid}%}
             sellItemAmount({_plr}, {_cost}, {_item}, {shop::itemAmount::%{_uuid}%}, true)
         make gui slot 25 with nametag named "&a&lCONFIRM SELL" with lore "&7Click here to confirm the selling" and "&7Amount: %{shop::itemAmount::%{_uuid}%}%":
-            sellItem({_plr}, {_cost}, {shop::itemAmount::%{_uuid}%}, {_item})
+            sellItem({_plr}, {_cost}, {_amount}, {_item})
     open last gui to {_plr}
 
 function shopBlocks(plr: player):
-    set {_uuid} to uuid of player
-    create a gui with virtual chest with 6 rows named "{@message_prefix}Block Category":
-        make gui slot 10 with grass block with lore " ", "{@color_first}Buy it for: $1 (Left Click)", "{@color_first}Sell it for: $0.5 (Right Click)" to run function buyItemAmount(player, 1, dirt) using left mouse button
-        make gui slot 10 with grass block with lore " ", "{@color_first}Buy it for: $1 (Left Click)", "{@color_first}Sell it for: $0.5 (Right Click)" to run function sellItemAmount(player, 1, dirt) using right mouse button
+    set {_uuid} to uuid of {_plr}
+    create a gui with virtual chest with 6 rows named "{@message_prefix} Block Category":
+        make gui slot 10 with grass block with lore " ", "{@color_first}Buy it for: $1 (Left Click)", "{@color_first}Sell it for: $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, dirt)
+            else:
+                buyItemAmount({_plr}, 1, dirt)
+    open last gui to {_plr}
 
 # --------------[ FUNCTIONS ]-------------- #
 
@@ -222,9 +220,10 @@ on unload:
 
 command /shop [<text>]:
     trigger:
-        create a gui with virtual chest with 3 rows named "{@message_prefix}Categories":
+        create a gui with virtual chest with 3 rows named "{@message_prefix} Categories":
             loop 27 times:
                 make next gui slot with {@filler}
-            make gui slot 10 with dirt named "{@color_first}Block Shop" with lore "&7Click here to open this category" to run function shopBlocks(player)
-
+            make gui slot 10 with dirt named "{@color_first} Blocks Category" with lore " ", "{@color_second}Click here to open this category" and " ":
+                shopBlocks(player)
+        open last gui to player
 # ---------------[ COMMANDS ]--------------- #
