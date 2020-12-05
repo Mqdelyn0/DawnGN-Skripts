@@ -182,11 +182,152 @@ function sellItemAmount(plr: player, cost: number, item: itemtype, amount: integ
 function shopBlocks(plr: player):
     set {_uuid} to uuid of {_plr}
     create a gui with virtual chest with 6 rows named "{@message_prefix} Block Category":
-        make gui slot 10 with grass block with lore " ", "{@color_first}Buy it for: $1 (Left Click)", "{@color_first}Sell it for: $0.5 (Right Click)" and " ":
+        loop 54 times:
+            make next gui slot with {@filler}
+# First Row of the category
+        make gui slot 10 with grass block with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, grass block)
+            else:
+                buyItemAmount({_plr}, 1, grass block)
+        make gui slot 11 with dirt with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
             if "%click type%" contains "right":
                 sellItemAmount({_plr}, 0.5, dirt)
             else:
                 buyItemAmount({_plr}, 1, dirt)
+        make gui slot 12 with stone with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, stone)
+            else:
+                buyItemAmount({_plr}, 1, stone)
+        make gui slot 13 with cobblestone with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, cobblestone)
+            else:
+                buyItemAmount({_plr}, 1, cobblestone)
+        make gui slot 14 with granite with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, granite)
+            else:
+                buyItemAmount({_plr}, 1, granite)
+        make gui slot 15 with diorite with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, diorite)
+            else:
+                buyItemAmount({_plr}, 1, diorite)
+        make gui slot 16 with gravel with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, gravel)
+            else:
+                buyItemAmount({_plr}, 1, gravel)
+# Second row of the category
+        make gui slot 19 with sand with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, sand)
+            else:
+                buyItemAmount({_plr}, 1, sand)
+        make gui slot 20 with red sand with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, red sand)
+            else:
+                buyItemAmount({_plr}, 1, red sand)
+        make gui slot 21 with prismarine with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, prismarine)
+            else:
+                buyItemAmount({_plr}, 1, prismarine)
+        make gui slot 22 with prismarine bricks with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, prismarine bricks)
+            else:
+                buyItemAmount({_plr}, 1, prismarine bricks)
+        make gui slot 23 with dark prismarine with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, dark prismarine)
+            else:
+                buyItemAmount({_plr}, 1, dark prismarine)
+        make gui slot 24 with sea lantern with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, sea lantern)
+            else:
+                buyItemAmount({_plr}, 1, sea lantern)
+        make gui slot 25 with brick block with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, brick block)
+            else:
+                buyItemAmount({_plr}, 1, brick block)
+#Third row of the category
+        make gui slot 28 with oak log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, oak log)
+            else:
+                buyItemAmount({_plr}, 1, oak log)
+        make gui slot 29 with spruce log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, spruce log)
+            else:
+                buyItemAmount({_plr}, 1, spruce log)
+        make gui slot 30 with birch log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, birch log)
+            else:
+                buyItemAmount({_plr}, 1, birch log)
+        make gui slot 31 with jungle log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, jungle log)
+            else:
+                buyItemAmount({_plr}, 1, jungle log)
+        make gui slot 32 with acacia log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, acacia log)
+            else:
+                buyItemAmount({_plr}, 1, acacia log)
+        make gui slot 33 with dark oak log with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, dark oak log)
+            else:
+                buyItemAmount({_plr}, 1, dark oak log)
+        make gui slot 34 with blue ice block with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, blue ice block)
+            else:
+                buyItemAmount({_plr}, 1, blue ice block)
+#Fourth row of the category
+        make gui slot 37 with purpur block with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, purpur block)
+            else:
+                buyItemAmount({_plr}, 1, purpur block)
+        make gui slot 38 with purpur pillar with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, purpur pillar)
+            else:
+                buyItemAmount({_plr}, 1, purpur pillar)
+        make gui slot 39 with nether bricks with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, nether bricks)
+            else:
+                buyItemAmount({_plr}, 1, nether bricks)
+        make gui slot 40 with red nether bricks with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, red nether bricks)
+            else:
+                buyItemAmount({_plr}, 1, red nether bricks)
+        make gui slot 41 with crimson stem with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, crimson stem)
+            else:
+                buyItemAmount({_plr}, 1, crimson stem)
+        make gui slot 42 with warped stem with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, warped stem)
+            else:
+                buyItemAmount({_plr}, 1, warped stem)
+        make gui slot 43 with snow block with lore " ", "{@color_first}Buy it for:{@color_second} $1 (Left Click)", "{@color_first}Sell it for:{@color_second} $0.5 (Right Click)" and " ":
+            if "%click type%" contains "right":
+                sellItemAmount({_plr}, 0.5, snow block)
+            else:
+                buyItemAmount({_plr}, 1, snow block)
     open last gui to {_plr}
 
 # --------------[ FUNCTIONS ]-------------- #
@@ -223,7 +364,7 @@ command /shop [<text>]:
         create a gui with virtual chest with 3 rows named "{@message_prefix} Categories":
             loop 27 times:
                 make next gui slot with {@filler}
-            make gui slot 10 with dirt named "{@color_first} Blocks Category" with lore " ", "{@color_second}Click here to open this category" and " ":
+            make gui slot 10 with dirt named "{@color_third}Blocks Category" with lore " ", "{@color_second}Click here to open this category" and " ":
                 shopBlocks(player)
         open last gui to player
 # ---------------[ COMMANDS ]--------------- #
