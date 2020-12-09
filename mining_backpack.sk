@@ -1,0 +1,213 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons:
+# Last Updated: 11/17/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &5&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &d
+    color_third: &5
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &d<script>.sk &7reloaded in &d<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &d<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+# ADD BLOCK TO BACKPACK
+function Backpack_AddBlock(plr: player, item: itemtype, amount: integer = 1):
+    set {_uuid} to uuid of {_plr}
+    set {_usable_item} to "%{_item}%"
+    replace all "southward ", "northward ", "westward ", "eastward " in {_usable_item} with ""
+    replace all " " in {_usable_item} with "_" 
+    add {_amount} to {backpack::player_contents::%{_uuid}%::%{_usable_item}%}
+
+# OPEN THE UPGRADE GUI TO PLAYER
+function Backpack_OpenUpgradeGUI(plr: player):
+    set {_uuid} to uuid of {_plr}
+    set {backpack::max_slots::%{_uuid}%} to 100 if {backpack::max_slots::%{_uuid}%} is not set
+    create a gui with virtual chest with 3 rows named "{@color_third}Upgrade Backpack":
+        loop 27 times:
+            make next gui slot with {@filler}
+            make gui slot 10 with emerald block named "{@color_first}Upgrade +1" with lore "{@color_fourth}Upgrade your backpack size by 1.", "", "{@color_first}Cost: {@color_second}50✦":
+                Backpack_UpgradeSize({_plr})
+    open last gui to {_plr}
+
+# UPGRADE PLAYER'S BACKPACK
+function Backpack_UpgradeSize(plr: player, amount: integer = 1):
+    set {_uuid} to uuid of {_plr}
+    set {_cost} to {_amount} * 50
+    if Crystals_Get({_plr}) >= {_cost}:
+        Crystals_Remove({_plr}, {_cost})
+        add {_amount} to {backpack::max_slots::%{_uuid}%}
+        Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1) 
+
+
+# OPEN THE BACKPACK GUI TO PLAYER
+function Backpack_OpenBackpackGUI(plr: player):
+    set {_uuid} to uuid of {_plr}
+    set {backpack::max_slots::%{_uuid}%} to 100 if {backpack::max_slots::%{_uuid}%} is not set
+    create a gui with virtual chest with 6 rows named "{@color_third}Backpack {@color_first}({@color_second}%Backpack_GetAmountOfItems({_plr})%{@color_fourth}/{@color_second}%{backpack::max_slots::%{_uuid}%}%{@color_first})":
+        loop 54 times:
+            make next gui slot with {@filler}
+        set {_total} to 0
+        make gui slot 10 with coal ore named "&8Coal Shards" with lore " ", "{@color_first}Amount: &8%{backpack::player_contents::%{_uuid}%::coal_ore} ? 0%", "{@color_first}Worth: &8%Backpack_GetWorth({_plr}, ""coal_ore"") ? 0%&8✦"
+        make gui slot 19 with iron ore named "&7Iron Shards" with lore " ", "{@color_first}Amount: &7%{backpack::player_contents::%{_uuid}%::iron_ore} ? 0%", "{@color_first}Worth: &7%Backpack_GetWorth({_plr}, ""iron_ore"") ? 0%&7✦"
+        make gui slot 28 with gold ore named "&6Gold Shards" with lore " ", "{@color_first}Amount: &6%{backpack::player_contents::%{_uuid}%::gold_ore} ? 0%", "{@color_first}Worth: &6%Backpack_GetWorth({_plr}, ""gold_ore"") ? 0%&6✦"
+        make gui slot 37 with lapis ore named "&3Lapis Shards" with lore " ", "{@color_first}Amount: &3%{backpack::player_contents::%{_uuid}%::lapis_ore} ? 0%", "{@color_first}Worth: &3%Backpack_GetWorth({_plr}, ""lapis_ore"") ? 0%&3✦"
+        make gui slot 20 with diamond ore named "&bDiamond Shards" with lore " ", "{@color_first}Amount: &b%{backpack::player_contents::%{_uuid}%::diamond_ore} ? 0%", "{@color_first}Worth: &b%Backpack_GetWorth({_plr}, ""diamond_ore"") ? 0%&b✦"
+        make gui slot 29 with emerald ore named "&aEmerald Shards" with lore " ", "{@color_first}Amount: &a%{backpack::player_contents::%{_uuid}%::emerald_ore} ? 0%", "{@color_first}Worth: &a%Backpack_GetWorth({_plr}, ""emerald_ore"") ? 0%&a✦"
+        make gui slot 22 with enchanted book named "{@color_third}Backpack Information" with lore " ", "{@color_first}The ores you mine in the caverns,", "{@color_first}Goes into this backpack, Where you", "{@color_first}can sell them for {@color_second}Crystals{@color_first}.", "{@color_first}Upgrade your capacity by doing", "{@color_second}/upradebackpack {@color_first}or {@color_second}/ubackpack", " ", "{@color_fourth}This is the Backpack Information."
+        make gui slot 31 with name tag named "{@color_third}Sell Backpack" with lore "{@color_first}Sells all items for {@color_second}Crystals{@color_first}.":
+            Backpack_SellBackpack({_plr})
+            close inventory of {_plr}
+        make gui slot 16 with coal block named "&8Coal Crystals" with lore " ", "{@color_first}Amount: &8%{backpack::player_contents::%{_uuid}%::block_of_coal} ? 0%", "{@color_first}Worth: &8%Backpack_GetWorth({_plr}, ""block_of_coal"") ? 0%&8✦"
+        make gui slot 25 with iron block named "&7Iron Crystals" with lore " ", "{@color_first}Amount: &7%{backpack::player_contents::%{_uuid}%::block_of_iron} ? 0%", "{@color_first}Worth: &7%Backpack_GetWorth({_plr}, ""block_of_iron"") ? 0%&7✦"
+        make gui slot 34 with gold block named "&6Gold Crystals" with lore " ", "{@color_first}Amount: &6%{backpack::player_contents::%{_uuid}%::block_of_gold} ? 0%", "{@color_first}Worth: &6%Backpack_GetWorth({_plr}, ""block_of_gold"") ? 0%&6✦"
+        make gui slot 43 with lapis block named "&3Lapis Crystals" with lore " ", "{@color_first}Amount: &3%{backpack::player_contents::%{_uuid}%::lapis_block} ? 0%", "{@color_first}Worth: &3%Backpack_GetWorth({_plr}, ""lapis_block"") ? 0%&3✦"
+        make gui slot 24 with diamond block named "&bDiamond Crystals" with lore " ", "{@color_first}Amount: &b%{backpack::player_contents::%{_uuid}%::block_of_diamond} ? 0%", "{@color_first}Worth: &b%Backpack_GetWorth({_plr}, ""block_of_diamond"") ? 0%&b✦"
+        make gui slot 33 with emerald block named "&aEmerald Crystals" with lore " ", "{@color_first}Amount: &a%{backpack::player_contents::%{_uuid}%::block_of_emerald} ? 0%", "{@color_first}Worth: &a%Backpack_GetWorth({_plr}, ""block_of_emerald"") ? 0%&a✦"
+    open last gui to {_plr}
+
+# GET WORTH OF ITEM
+function Backpack_GetWorth(plr: player, item: string) :: number:
+    set {_uuid} to uuid of {_plr}
+    set {_return} to ({backpack::player_contents::%{_uuid}%::%{_item}%} * {backpack::sell_prices::%{_item}%})
+    return {_return}
+
+# SELL BACKPACK OF PLAYER
+function Backpack_SellBackpack(plr: player):
+    set {_amount} to Backpack_GetWholeWorth({_plr})
+    set {_uuid} to uuid of {_plr}
+    loop indices of {backpack::player_contents::%{_uuid}%::*}:
+        add Backpack_GetWorth({_plr}, loop-value) to {_amount}
+    set {_string_to_split} to "%{_amount}%"
+    set {_strings::*} to {_string_to_split} split at ""
+    set {_strings::0} to " "
+    loop {_strings::*}:
+        delete {_strings::%loop-index%}
+        set {_obfuscated} to "&k0&k0&k0&k0&k0&k0&k0&k0&k0&k0"
+        set {_string} to "%{_string} ? """"%%loop-value%"
+        delete {_size}
+        set {_size} to (size of {_strings::*} * 3) - 3 if (size of {_strings::*} * 3) - 3 > 0
+        delete {_still_hidden}
+        set {_still_hidden} to last {_size} characters of {_obfuscated} ? ""
+        send title "{@color_third}&lSELLING..." with subtitle "{@color_first}You got {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}✦ {@color_first}crystals!" to {_plr} with fadein 0 seconds and fadeout 0 seconds
+        Lib_PlaySound({_plr}, "BLOCK_NOTE_BLOCK_PLING", 0.1)
+        wait 1 second
+        if size of {_strings::*} <= 1:
+            stop loop
+    Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+    Crystals_Add({_plr}, {_amount})
+    send subtitle "{@color_first}You sold all items for {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}✦ {@color_first}crystals!" to {_plr} with fadein 0 seconds and fadeout 1 seconds
+    delete {backpack::player_contents::%{_uuid}%::*}
+
+# GET AMOUNT OF STUFF IN BACKPACK
+function Backpack_GetAmountOfItems(plr: player) :: number:
+    set {_uuid} to uuid of {_plr}
+    set {_return} to 0
+    loop indices of {backpack::player_contents::%{_uuid}%::*}:
+        add {backpack::player_contents::%{_uuid}%::%loop-value%} to {_return}
+    return {_return}
+
+# GET WORTH OF ALL
+function Backpack_GetWholeWorth(plr: player) :: number:
+    set {_return} to 0
+    set {_uuid} to uuid of {_plr}
+    loop indices of {backpack::player_contents::%{_uuid}%::*}:
+        add Backpack_GetWorth({_plr}, loop-value) to {_return}
+    return {_return}
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+    set {backpack::sell_prices::coal_ore} to 0.5
+    set {backpack::sell_prices::iron_ore} to 1
+    set {backpack::sell_prices::gold_ore} to 2
+    set {backpack::sell_prices::lapis_ore} to 4
+    set {backpack::sell_prices::diamond_ore} to 8
+    set {backpack::sell_prices::emerald_ore} to 16
+    set {backpack::sell_prices::block_of_coal} to 1
+    set {backpack::sell_prices::block_of_iron} to 2
+    set {backpack::sell_prices::block_of_gold} to 4
+    set {backpack::sell_prices::block_of_lapis} to 8
+    set {backpack::sell_prices::block_of_diamond} to 16
+    set {backpack::sell_prices::block_of_emerald} to 32
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+command /upgradebackpack:
+    aliases: /ubackpack
+
+command /backpack:
+    trigger:
+        Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 1)
+        Backpack_OpenBackpackGUI(player)
+# ---------------[ COMMANDS ]--------------- #
