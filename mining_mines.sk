@@ -183,15 +183,19 @@ on right click with blaze rod:
 
 on block break:
     set {_bounds::*} to bounds at event-block
-    "%{_bounds::1}%" contains "mines"
     set {_str} to "%{_bounds::1}%"
     set {_mine::*} to {_str} split at "_"
-    cancel drops
     set {_edited_block} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_edited_block} with ""
     replace all " " in {_edited_block} with "_"
+    "%{_bounds::1}%" contains "mines"
+    cancel drops
+    wait 1 tick
+    event is not cancelled
     if {mines::created_mines::%{_mine::2}%::blocks::%{_edited_block}%::*} is not set:
-        cancel event
+        set {_block} to {_edited_block}
+        replace "_" in {_block} with " "
+        set event-block to {_block} parsed as an itemtype
         stop
     set event-block to bedrock
 # ---------------[ EVENTS ]--------------- #
