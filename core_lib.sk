@@ -213,7 +213,7 @@ function Money_Add(plr: player, add_bal: number):
 function Money_Remove(plr: player, take_bal: number):
     {_take_bal} > 0
     set {_uuid} to uuid of {_plr}
-    remove {_add_bal} from {lib::balance_money::%{_uuid}%}
+    remove {_take_bal} from {lib::balance_money::%{_uuid}%}
 
 function Crystals_Get(plr: player) :: number:
     set {_uuid} to uuid of {_plr}
