@@ -108,7 +108,7 @@ on unload:
             play sound "BLOCK_NOTE_BLOCK_PLING" at pitch 0.9 to loop-player
             send {_message} to loop-player
 
-every 5 minutes:
+every 10 minutes:
     lottery("s")
 
 # ---------------[ EVENTS ]--------------- #
