@@ -827,27 +827,37 @@ function shopMisc(plr: player):
                 sellItemAmount({_plr}, 512, name tag)
             else:
                 buyItemAmount({_plr}, 1024, name tag)
-        make gui slot 13 with coal block named "&8Coal &7[Unreliable Generator]" with lore " ", "{@color_first}Buy it for:{@color_second} $50 (Left Click)" and " ":
-            buyCommand({_plr}, 50, "&8Coal &7[Unreliable Generator]", "/gens give %player% coal_ore 1")
-        make gui slot 14 with soul sand with lore " ", "{@color_first}Buy it for:{@color_second} $512 (Left Click)", "{@color_first}Sell it for:{@color_second} $256 (Right Click)" and " ":
+        make gui slot 13 with soul sand with lore " ", "{@color_first}Buy it for:{@color_second} $512 (Left Click)", "{@color_first}Sell it for:{@color_second} $256 (Right Click)" and " ":
             if "%click type%" contains "right":
                 sellItemAmount({_plr}, 256, soul sand)
             else:
                 buyItemAmount({_plr}, 512, soul sand)
-        make gui slot 15 with enchanting table with lore " ", "{@color_first}Buy it for:{@color_second} $2048 (Left Click)" and " ":
+        make gui slot 14 with enchanting table with lore " ", "{@color_first}Buy it for:{@color_second} $2048 (Left Click)" and " ":
             buyItemAmount({_plr}, 2048, enchanting table)
-        make gui slot 16 with anvil with lore " ", "{@color_first}Buy it for:{@color_second} $1024 (Left Click)" and " ":
+        make gui slot 15 with anvil with lore " ", "{@color_first}Buy it for:{@color_second} $1024 (Left Click)" and " ":
             buyItemAmount({_plr}, 1024, anvil)
-# Second Row of the category
-        make gui slot 19 with bookshelf with lore " ", "{@color_first}Buy it for:{@color_second} $1024 (Left Click)" and " ":
+        make gui slot 16 with bookshelf with lore " ", "{@color_first}Buy it for:{@color_second} $1024 (Left Click)" and " ":
             buyItemAmount({_plr}, 1024, bookshelf)
-        make gui slot 20 with book with lore " ", "{@color_first}Buy it for:{@color_second} $128 (Left Click)" and " ":
+# Second Row of the category
+        make gui slot 19 with book with lore " ", "{@color_first}Buy it for:{@color_second} $128 (Left Click)" and " ":
             buyItemAmount({_plr}, 128, book)
-        make gui slot 21 with experience bottle with lore " ", "{@color_first}Buy it for:{@color_second} $768 (Left Click)" and " ":
+        make gui slot 20 with experience bottle with lore " ", "{@color_first}Buy it for:{@color_second} $768 (Left Click)" and " ":
             buyItemAmount({_plr}, 768, experience bottle)
         make gui slot 27 with barrier named "&c&lRETURN" with lore " ", "{@color_first}Return to the main menu" and "":
             execute player command "/shop"
     open last gui to {_plr}
+
+function shopGen(plr: player):
+    set {_uuid} to uuid of {_plr}
+    create a gui with virtual chest with 3 rows named "{@message_prefix} Generator Category":
+        loop 27 times:
+            make next gui slot with {@filler}
+# First Row of the category
+        make gui slot 11 with coal block named "&8Coal &7[Unreliable Generator]" with lore " ", "{@color_first}Buy it for:{@color_second} $250 (Left Click)" and " ":
+            buyCommand({_plr}, 250, "&8Coal &7[Unreliable Generator]", "/gens give %player% coal_ore 1")
+        make gui slot 15 with name tag named "{@color_third}How do you upgrade your generator?" with lore " ", "{@color_first}You can upgrade your generator", "{@color_first}by shift right clicking the generator." and " "
+    open last gui to {_plr}
+
 # --------------[ FUNCTIONS ]-------------- #
 
 
@@ -888,6 +898,8 @@ command /shop [<text>]:
                 shopTools(player)
             make gui slot 12 with iron chestplate named "{@color_third}Armor Category" with lore " ", "{@color_second}Click here to open this category" and " ":
                 shopArmor(player)
+            make gui slot 13 with coal ore named "{@color_third}Generator Category" with lore " ", "{@color_second}Click here to open this category" and " ":
+                shopGen(player)
             make gui slot 14 with redstone dust named "{@color_third}Redstone Category" with lore " ", "{@color_second}Click here to open this category" and " ":
                 shopRedstone(player)
             make gui slot 15 with diamond named "{@color_third}Ores Category" with lore " ", "{@color_second}Click here to open this category" and " ":
