@@ -62,7 +62,7 @@ options:
 
 function addLevel(plr: player):
     set {_uuid} to uuid of {_plr}
-    remove {leveling::needed_exp::%{leveling::current_level::%{_uuid}%}%} from {leveling::current_exp::%{_uuid}%}
+    remove ({leveling::needed_exp::%{leveling::current_level::%{_uuid}%}%}+({leveling::current_prestige::%{_uuid}%}*0.75)) from {leveling::current_exp::%{_uuid}%}
     add 1 to {leveling::current_level::%{_uuid}%}
     send title "{@color_third}&lLEVEL UP!" with subtitle "{@color_first}Your new {@color_second}level {@color_first}is {@color_second}%{leveling::current_level::%{_uuid}%}%" to {_plr}
     play sound "entity.player.levelup" to {_plr}
@@ -97,10 +97,11 @@ on unload:
 on join:
     set {leveling::current_level::%player's uuid%} to 1 if {leveling::current_level::%player's uuid%} is not set
     set {leveling::current_exp::%player's uuid%} to 0 if {leveling::current_exp::%player's uuid%} is not set
+    set {leveling::current_prestige::%player's uuid%} to 0 if {leveling::current_prestige::%player's uuid%} is not set
 
 on join:
     while player is online:
-        while {leveling::current_exp::%player's uuid%} >= {leveling::needed_exp::%{leveling::current_level::%player's uuid%}%}:
+        while {leveling::current_exp::%player's uuid%} >= ({leveling::needed_exp::%{leveling::current_level::%player's uuid%}%}+({leveling::current_prestige::%player's uuid%}*0.75)):
             addLevel(player)
             wait 5 ticks
         wait 5 ticks
@@ -111,15 +112,55 @@ on join:
 
 # ---------------[ COMMANDS ]--------------- #
 
-command /leveladd [<integer>]:
+command /expadd [<integer>]:
     permission: *
     trigger:
         add arg-1 to {leveling::current_exp::%player's uuid%}
 
-command /level:
+command /level [<player>]:
     trigger:
-        send "&7Current Exp: %{leveling::current_exp::%player's uuid%}%"
-        send "&7Needed Exp: %{leveling::needed_exp::%{leveling::current_level::%player's uuid%}%}%"
-        send "&7Current Level: %{leveling::current_level::%player's uuid%}%"
+        if arg-1 is not set:
+            set {_name} to player's uuid
+            set {_name2} to player
+        else:
+            set {_name} to arg-1's uuid
+            set {_name2} to arg-1
+        send "{@color_third}&lLEVEL INFO:"
+        send " "
+        send "{@color_second} Name of player: %{_name2}%"
+        send "{@color_second} Current Exp: {@color_first}%{leveling::current_exp::%{_name}%}%"
+        send "{@color_second} Needed Exp: {@color_first}%({leveling::needed_exp::%{leveling::current_level::%{_name}%}%}+({leveling::current_prestige::%{_name}%}*0.75))%"
+        send "{@color_second} Current Level: {@color_first}%{leveling::current_level::%{_name}%}%"
+        send "{@color_second} Current Prestige: {@color_first}%{leveling::current_prestige::%{_name}%}%"
+        send " "
+
+command /prestige [<text>]:
+    trigger:
+        create a gui with virtual chest with 3 rows named "&9Prestige GUI":
+            loop 54 times:
+                make next gui slot with {@filler}
+            make gui slot 11 with emerald named "{@color_third}&lCONFIRM PRESTIGE" with lore " ", "{@color_first}Click here to prestige." and " ":
+                if {leveling::current_level::%player's uuid%} >= 100:
+                    if Money_Get(player) >= 7500000+{leveling::current_prestige::%player's uuid%}*1100000:
+                        Money_Remove(player, (7500000+{leveling::current_prestige::%player's uuid%}*1100000))
+                        add 1 to {leveling::current_prestige::%player's uuid%}
+                        set {leveling::current_exp::%player's uuid%} to 0
+                        set {leveling::current_level::%player's uuid%} to 1
+                        add 0.03 to {shop::multiplier::%uuid of player%}
+                        play sound "block.note_block.pling" to all players
+                        broadcast ""
+                        broadcast " {@color_second}&kiii {@color_third}&lPRESTIGE! {@color_second}&n%player%{@color_second} prestiged to prestige &n%{leveling::current_prestige::%player's uuid%}%&r {@color_second}&kiii"
+                        broadcast ""
+                        close inventory of player
+                    else:
+                        close inventory of player
+                        send "{@message_prefix} {@color_error}You don't have the required amount of money to prestige"
+                        play sound "entity.villager.no" to player
+                else:
+                    close inventory of player
+                    send "{@message_prefix} {@color_error}You need level &n100{@color_error} or above to prestige"
+                    play sound "entity.villager.no" to player
+            make gui slot 15 with paper named "{@color_third}&lPRESTIGE INFO" with lore " ", "{@color_first}You can start prestiging", "{@color_first}if you meet the following requirements:", "{@color_first} ● Level 100", "{@color_first} ● $%7500000+{leveling::current_prestige::%player's uuid%}*1100000%", " ", "{@color_first}You'll get the following in return:", "{@color_first} ● 0.03x Multiplier", "{@color_first} ● More soon." and " "
+        open last gui to player
 
 # ---------------[ COMMANDS ]--------------- #
