@@ -107,14 +107,14 @@ function Pickaxe_DoUpgrade(plr: player, enchant: string, current_level: integer)
 
 # UPDATE LOL
 function Pickaxe_UpdateLore(plr: player):
-    set {_enchants::*} to "Generosity", "CrystalExtractor", "Transfuse", "Intelligence", "Superbreaker", "TreasureFinder", "Income", "Prosperity", "Librarian", "Fracture", "Autosell", "Momentum", "Vitals", "Upgrader"
+    set {_enchants::*} to "Generosity", "CrystalExtractor", "Transfuse", "Intelligence", "Superbreaker", "TreasureFinder", "Income", "Prosperity", "Librarian", "Fracture", "Autosell", "Momentum", "Vitals"
     loop {_enchants::*}:
         set {_tag} to loop-value tag of nbt of {_plr}'s tool
         if {_tag} != "0":
             set {_levels::%loop-value%} to {_tag}
         else if {_tag} = "0":
             set {_levels::%loop-value%} to "none"
-    set {_lores::*} to " ", "&5&lENCHANTMENTS", "{@color_fourth}¬ {@color_first}Generosity: {@color_second}%{_levels::Generosity}%", "{@color_fourth}¬ {@color_first}Crystal Extractor: {@color_second}%{_levels::CrystalExtractor}%", "{@color_fourth}¬ {@color_first}Transfuse: {@color_second}%{_levels::Transfuse}%", "{@color_fourth}¬ {@color_first}Intelligence: {@color_second}%{_levels::Intelligence}%", "{@color_fourth}¬ {@color_first}Superbreaker: {@color_second}%{_levels::Superbreaker}%", "{@color_fourth}¬ {@color_first}Treasure Finder: {@color_second}%{_levels::TreasureFinder}%", "{@color_fourth}¬ {@color_first}Income: {@color_second}%{_levels::Income}%", "{@color_fourth}¬ {@color_first}Prosperity: {@color_second}%{_levels::Prosperity}%", "{@color_fourth}¬ {@color_first}Librarian: {@color_second}%{_levels::Librarian}%", "{@color_fourth}¬ {@color_first}Fracture: {@color_second}%{_levels::Fracture}%", "{@color_fourth}¬ {@color_first}Autosell: {@color_second}%{_levels::Autosell}%", "{@color_fourth}¬ {@color_first}Momentum: {@color_second}%{_levels::Momentum}%", "{@color_fourth}¬ {@color_first}Vitals: {@color_second}%{_levels::Vitals}%", "{@color_fourth}¬ {@color_first}Upgrader: {@color_second}%{_levels::Upgrader}%", " ", "{@color_fourth}Right Click to upgrade!"
+    set {_lores::*} to " ", "&5&lENCHANTMENTS", "{@color_fourth}¬ {@color_first}Generosity: {@color_second}%{_levels::Generosity}%", "{@color_fourth}¬ {@color_first}Crystal Extractor: {@color_second}%{_levels::CrystalExtractor}%", "{@color_fourth}¬ {@color_first}Transfuse: {@color_second}%{_levels::Transfuse}%", "{@color_fourth}¬ {@color_first}Intelligence: {@color_second}%{_levels::Intelligence}%", "{@color_fourth}¬ {@color_first}Superbreaker: {@color_second}%{_levels::Superbreaker}%", "{@color_fourth}¬ {@color_first}Treasure Finder: {@color_second}%{_levels::TreasureFinder}%", "{@color_fourth}¬ {@color_first}Income: {@color_second}%{_levels::Income}%", "{@color_fourth}¬ {@color_first}Prosperity: {@color_second}%{_levels::Prosperity}%", "{@color_fourth}¬ {@color_first}Librarian: {@color_second}%{_levels::Librarian}%", "{@color_fourth}¬ {@color_first}Fracture: {@color_second}%{_levels::Fracture}%", "{@color_fourth}¬ {@color_first}Autosell: {@color_second}%{_levels::Autosell}%", "{@color_fourth}¬ {@color_first}Momentum: {@color_second}%{_levels::Momentum}%", "{@color_fourth}¬ {@color_first}Vitals: {@color_second}%{_levels::Vitals}%", " ", "{@color_fourth}Right Click to upgrade!"
     set {_line} to 0
     loop {_lores::*}:
         if loop-value contains "none":
@@ -148,8 +148,8 @@ function Pickaxe_OpenUpgradesGUI(plr: player):
         set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Superbreaker", {_level}) ? "No Data"
         make gui slot 14 with enchanted book named "{@color_third}Superbreaker" with lore "{@color_fourth}Grants the effect of Haste.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}20", "{@color_first}Current Chance: {@color_second}%{_level} * 0.5%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
             Pickaxe_DoUpgrade({_plr}, "Superbreaker", {_level})
-        set {_level} to Pickaxe_GetCurrentLevel({_plr}, "Treasure Finder")
-        set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Treasure Finder", {_level}) ? "No Data"
+        set {_level} to Pickaxe_GetCurrentLevel({_plr}, "TreasureFinder")
+        set {_upgrade_cost} to Pickaxe_GetUpgradeCost("TreasureFinder", {_level}) ? "No Data"
         make gui slot 15 with enchanted book named "{@color_third}Treasure Finder" with lore "{@color_fourth}Find some crystal boxes whilst mining.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}35", "{@color_first}Current Chance: {@color_second}%{_level} * 0.20%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
             Pickaxe_DoUpgrade({_plr}, "TreasureFinder", {_level})
         set {_level} to Pickaxe_GetCurrentLevel({_plr}, "Income")
@@ -162,7 +162,7 @@ function Pickaxe_OpenUpgradesGUI(plr: player):
             Pickaxe_DoUpgrade({_plr}, "Prosperity", {_level})
         set {_level} to Pickaxe_GetCurrentLevel({_plr}, "Librarian")
         set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Librarian", {_level}) ? "No Data"
-        make gui slot 20 with enchanted book named "{@color_third}Librarian" with lore "{@color_fourth}Get levels whilst mining.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}100", "{@color_first}Current Chance: {@color_second}%{_level} * 0.02%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
+        make gui slot 20 with enchanted book named "{@color_third}Librarian" with lore "{@color_fourth}Get levels whilst mining.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}100", "{@color_first}Current Chance: {@color_second}%{_level} * 0.005%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
             Pickaxe_DoUpgrade({_plr}, "Librarian", {_level})
         set {_level} to Pickaxe_GetCurrentLevel({_plr}, "Fracture")
         set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Fracture", {_level}) ? "No Data"
@@ -180,10 +180,7 @@ function Pickaxe_OpenUpgradesGUI(plr: player):
         set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Vitals", {_level}) ? "No Data"
         make gui slot 24 with enchanted book named "{@color_third}Vitals" with lore "{@color_fourth}Get a burst of Regeneration.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}50", "{@color_first}Current Chance: {@color_second}%{_level} * 0.15%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
             Pickaxe_DoUpgrade({_plr}, "Vitals", {_level})
-        set {_level} to Pickaxe_GetCurrentLevel({_plr}, "Upgrader")
-        set {_upgrade_cost} to Pickaxe_GetUpgradeCost("Upgrader", {_level}) ? "No Data"
-        make gui slot 25 with enchanted book named "{@color_third}Upgrader" with lore "{@color_fourth}Ores you break have a chance", "{@color_fourth}to turn into it's block form.", " ", "{@color_first}Current Level: {@color_second}%{_level}%{@color_fourth}/{@color_second}50", "{@color_first}Current Chance: {@color_second}%{_level} * 0.075%{@color_second}%%", "{@color_first}Upgrade Price: {@color_second}%{_upgrade_cost}%":
-            Pickaxe_DoUpgrade({_plr}, "Upgrader", {_level})
+        make gui slot 25 with barrier named "{@color_third}&lEMPTY ENTRY" with lore "{@color_fourth}Coming Soon..."
     open last gui to {_plr}
 # --------------[ FUNCTIONS ]-------------- #
 
@@ -203,50 +200,46 @@ on load:
     delete {pickaxe::upgrade_costs::*}
     set {_loops} to 1
     loop 50 times:
-        set {pickaxe::upgrade_costs::generosity::%loop-number - 1%} to (({pickaxe::upgrade_costs::generosity::%loop-number - 2%} ? 30) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::generosity::%loop-number - 1%} to (({pickaxe::upgrade_costs::generosity::%loop-number - 2%} ? 120) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 40 times:
-        set {pickaxe::upgrade_costs::crystalextractor::%loop-number - 1%} to (({pickaxe::upgrade_costs::crystalextractor::%loop-number - 2%} ? 45) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::crystalextractor::%loop-number - 1%} to (({pickaxe::upgrade_costs::crystalextractor::%loop-number - 2%} ? 180) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 60 times:
-        set {pickaxe::upgrade_costs::transfuse::%loop-number - 1%} to (({pickaxe::upgrade_costs::transfuse::%loop-number - 2%} ? 20) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::transfuse::%loop-number - 1%} to (({pickaxe::upgrade_costs::transfuse::%loop-number - 2%} ? 80) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 20 times:
-        set {pickaxe::upgrade_costs::intelligence::%loop-number - 1%} to (({pickaxe::upgrade_costs::intelligence::%loop-number - 2%} ? 35) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::intelligence::%loop-number - 1%} to (({pickaxe::upgrade_costs::intelligence::%loop-number - 2%} ? 140) + ({_loops} * 2))
         add 1 to {_loops}
     set {pickaxe::upgrade_costs::superbreaker::0} to 600
     set {pickaxe::upgrade_costs::superbreaker::1} to 1200
     set {_loops} to 1
     loop 35 times:
-        set {pickaxe::upgrade_costs::treasurefinder::%loop-number - 1%} to (({pickaxe::upgrade_costs::treasurefinder::%loop-number - 2%} ? 55) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::treasurefinder::%loop-number - 1%} to (({pickaxe::upgrade_costs::treasurefinder::%loop-number - 2%} ? 220) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 25 times:
-        set {pickaxe::upgrade_costs::income::%loop-number - 1%} to (({pickaxe::upgrade_costs::income::%loop-number - 2%} ? 15) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::income::%loop-number - 1%} to (({pickaxe::upgrade_costs::income::%loop-number - 2%} ? 60) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 30 times:
-        set {pickaxe::upgrade_costs::prosperity::%loop-number - 1%} to (({pickaxe::upgrade_costs::prosperity::%loop-number - 2%} ? 35) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::prosperity::%loop-number - 1%} to (({pickaxe::upgrade_costs::prosperity::%loop-number - 2%} ? 140) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 100 times:
-        set {pickaxe::upgrade_costs::librarian::%loop-number - 1%} to (({pickaxe::upgrade_costs::librarian::%loop-number - 2%} ? 60) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::librarian::%loop-number - 1%} to (({pickaxe::upgrade_costs::librarian::%loop-number - 2%} ? 280) + ({_loops} * 2))
         add 1 to {_loops}
     set {_loops} to 1
     loop 35 times:
-        set {pickaxe::upgrade_costs::fracture::%loop-number - 1%} to (({pickaxe::upgrade_costs::fracture::%loop-number - 2%} ? 25) + ({_loops} / 4))
+        set {pickaxe::upgrade_costs::fracture::%loop-number - 1%} to (({pickaxe::upgrade_costs::fracture::%loop-number - 2%} ? 100) + ({_loops} * 2))
         add 1 to {_loops}
     set {pickaxe::upgrade_costs::autosell::0} to 1500
     set {pickaxe::upgrade_costs::momentum::0} to 1500
     set {pickaxe::upgrade_costs::momentum::1} to 3000
     set {pickaxe::upgrade_costs::vitals::0} to 1250
-    set {_loops} to 1
-    loop 50 times:
-        set {pickaxe::upgrade_costs::upgrader::%loop-number - 1%} to (({pickaxe::upgrade_costs::upgrader::%loop-number - 2%} ? 15) + ({_loops} / 4))
-        add 1 to {_loops}
 
 on unload:
     set {lib::unload_time} to now
@@ -268,20 +261,19 @@ on block break:
     set {_mine::*} to {_str} split at "_"
     "%{_bounds::1}%" contains "mines"
     if name of player's tool contains "Prospector's Pickaxe":
-        set {_generosity} to (Pickaxe_GetCurrentLevel(player, "Generosity") * 0.2) / 10
-        set {_crystal_extractor} to (Pickaxe_GetCurrentLevel(player, "CrystalExtractor") * 0.15) / 10
-        set {_transfuse} to (Pickaxe_GetCurrentLevel(player, "Transfuse") * 0.1167) / 10
+        set {_generosity} to Pickaxe_GetCurrentLevel(player, "Generosity") * 0.2
+        set {_crystal_extractor} to Pickaxe_GetCurrentLevel(player, "CrystalExtractor") * 0.15
+        set {_transfuse} to Pickaxe_GetCurrentLevel(player, "Transfuse") * 0.1167
         set {_intelligence} to Pickaxe_GetCurrentLevel(player, "Intelligence") * 0.25
         set {_superbreaker} to Pickaxe_GetCurrentLevel(player, "Superbreaker")
-        set {_treasurefinder} to Pickaxe_GetCurrentLevel(player, "Treasure Finder") * 0.20
+        set {_treasurefinder} to Pickaxe_GetCurrentLevel(player, "TreasureFinder") * 0.20
         set {_income} to Pickaxe_GetCurrentLevel(player, "Income") * 0.25
         set {_prosperity} to Pickaxe_GetCurrentLevel(player, "Prosperity") * 0.15
-        set {_librarian} to Pickaxe_GetCurrentLevel(player, "Librarian") * 0.02
+        set {_librarian} to Pickaxe_GetCurrentLevel(player, "Librarian") * 0.005
         set {_fracture} to Pickaxe_GetCurrentLevel(player, "Fracture") * 0.1428
         set {_autosell} to Pickaxe_GetCurrentLevel(player, "Autosell")
         set {_momentum} to Pickaxe_GetCurrentLevel(player, "Momentum")
         set {_vitals} to Pickaxe_GetCurrentLevel(player, "Vitals")
-        set {_upgrader} to Pickaxe_GetCurrentLevel(player, "Upgrader") * 0.075
         chance of {_generosity}%:
             loop all players:
                 set {_random} to a random number between 0.5 and 16
@@ -293,17 +285,81 @@ on block break:
             Crystals_Add(player, {_random})
             Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
             send "{@message_prefix} {@color_first}You got {@color_second}%{_random}%{@color_second}✦ {@color_first}crystals!" to player
-        chance of {_intelligence}
+        chance of {_intelligence}%:
+            set {_random} to a random number between 0.1 and 0.5
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_first}You got {@color_second}%{_random}%{@color_second}XP{@color_first}!" to player
+            add {_random} to {leveling::current_exp::%uuid of player%}
+        chance of {_treasurefinder}%:
+            set {_types::0} to "crystals"
+            set {_types::1} to "crystals"
+            set {_types::2} to "crystals"
+            set {_types::3} to "crystals"
+            set {_types::4} to "crystals"
+            set {_types::5} to "money"
+            set {_types::6} to "money"
+            set {_rarity::0} to "common"
+            set {_rarity::1} to "common"
+            set {_rarity::2} to "common"
+            set {_rarity::3} to "common"
+            set {_rarity::4} to "common"
+            set {_rarity::5} to "uncommon"
+            set {_rarity::6} to "uncommon"
+            set {_rarity::7} to "uncommon"
+            set {_rarity::8} to "rare"
+            set {_box_rarity} to random element out of {_rarity::*}
+            set {_box_type} to random element out of {_types::*}
+            send "{@message_prefix} {@color_first}You got a {@color_second}%{_box_rarity}% {@color_second}%{_box_type}% {@color_first}box!" to player
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            Boxes_GiveBox(player, {_box_type}, {_box_rarity})
+        chance of {_income}%:
+            set {_salary} to random integer between 10000 and 50000
+            send "{@message_prefix} {@color_second}Income {@color_first}gave you {@color_second}$%{_salary}%{@color_first}!" to player
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            Money_Add(player, {_salary})
+        chance of {_prosperity}%:
+            set {_extra} to random integer between 1 and 3
+            send "{@message_prefix} {@color_first}You got {@color_second}%{_extra}% {@color_first}extra block(s)!" to player
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            Backpack_AddBlock(player, event-block, {_extra})
+        chance of {_librarian}%:
+            send "{@message_prefix} {@color_first}You got a level!" to player
+            Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            add {leveling::needed_exp::%{leveling::current_level::%uuid of player%}%} to {leveling::current_exp::%uuid of player%}
+        chance of {_fracture}%:
+            loop all blocks in radius 5 of player:
+                if "%bounds at loop-block%" contains "mines":
+                    if block at loop-block = coal ore or iron ore or gold ore or lapis lazuli ore or diamond ore or emerald ore or coal block or iron block or gold block or lapis lazuli block or diamond block or emerald block:
+                        Backpack_AddBlock(player, loop-block)
+                        set block at loop-block to bedrock
+                        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+            send "{@message_prefix} {@color_second}Fracture {@color_first}broke extra block(s) around you!" to player
+        if {_autosell} >= 1:
+            if {pickaxe::last_autosell::%uuid of player%} is not set:
+                set {pickaxe::last_autosell::%uuid of player%} to now
+            if difference between {pickaxe::last_autosell::%uuid of player%} and now >= 1 minute:
+                set {pickaxe::last_autosell::%uuid of player%} to now
+                send "{@message_prefix} {@color_first}Your sold your backpack automatically!"
+                Backpack_SellBackpack(player)
+        if {_momentum} >= 1:
+            remove speed from player
+            apply potion of speed of tier {_momentum} to player for 3 seconds
+        if {_vitals} >= 1:
+            remove regeneration from player
+            apply potion of regeneration of tier {_vitals} to player for 3 seconds
+        if {_superbreaker} >= 1:
+            remove haste from player
+            apply potion of haste of tier {_superbreaker} to player for 3 seconds
         chance of {_transfuse}%:
             set {_usable_block} to "%event-block%"
             replace all "southward ", "northward ", "westward ", "eastward " in {_usable_block} with ""
             replace all " " in {_usable_block} with "_"
-            set {_convert::coal_ore} to block of coal
-            set {_convert::iron_ore} to block of iron
-            set {_convert::gold_ore} to block of gold
-            set {_convert::lapis_ore} to lapis block
-            set {_convert::diamond_ore} to block of diamond
-            set {_convert::emerald_ore} to block of emerald
+            set {_convert::coal_ore} to coal block
+            set {_convert::iron_ore} to iron block
+            set {_convert::gold_ore} to gold block
+            set {_convert::lapis_ore} to lapis lazuli block
+            set {_convert::diamond_ore} to diamond block
+            set {_convert::emerald_ore} to emerald block
             set {_block} to {_convert::%{_usable_block}%} if {_convert::%{_usable_block}%} is set
             set {_block} to event-block if {_convert::%{_usable_block}%} is not set
             Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)

@@ -132,7 +132,12 @@ function Mining_OpenPickaxeShopGUI(plr: player):
     create a gui with virtual chest with 3 rows named "{@color_third}Pickaxe Shop":
         loop 27 times:
             make next gui slot with {@filler}
-        make gui slot 13 with enchanted book named ""
+        make gui slot 13 with shiny diamond pickaxe named "{@color_third}Prospector's Pickaxe" with lore "{@color_first}Cost: {@color_second}$15k":
+            if Money_Get({_plr}) >= 15000:
+                Money_Remove({_plr}, 15000)
+                send "{@message_prefix} {@color_first}You bought the {@color_second}Prospector's Pickaxe {@color_first}for {@color_second}$15k!" to {_plr}
+                Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+                Pickaxe_GivePickaxe({_plr})
     open last gui to {_plr}
 
 # OPEN MAIN GUI
@@ -142,9 +147,9 @@ function Mining_OpenMainGUI(plr: player):
             make next gui slot with {@filler}
         make gui slot 10 with clock named "{@color_third}Pass Shop" with lore " ", "{@color_first}Buy a {@color_second}Mining Pass&r {@color_first}or buy", "{@color_first}more time to your {@color_second}Mining Pass&r{@color_first}.", " ", "{@color_fourth}Click me to open the Pass Shop.":
             Mining_OpenPassShopGUI({_plr})
-        make gui slot 13 with enchanted book named "{@color_third}Mining Information" with lore " ", "{@color_second}Mining {@color_first}is a feature on {@color_second}DawnGN{@color_first},", "{@color_first}That lets you mine for {@color_second}crystals&r{@color_first}!", "{@color_first}You need a {@color_second}Mining Pass&r {@color_first}and a", "{@color_second}Burrow's Pickaxe&r {@color_first}to mine in the", "{@color_first}caverns you need gear to fight", "{@color_first}other players and protect yourself", "{@color_first}from the {@color_second}Hostile Mobs&r{@color_first}.", " ", "{@color_fourth}Click me to view Crystals Information.":
+        make gui slot 13 with enchanted book named "{@color_third}Mining Information" with lore " ", "{@color_second}Mining {@color_first}is a feature on {@color_second}DawnGN{@color_first},", "{@color_first}That lets you mine for {@color_second}crystals&r{@color_first}!", "{@color_first}You need a {@color_second}Mining Pass&r {@color_first}and a", "{@color_second}Prospector's Pickaxe&r {@color_first}to mine in the", "{@color_first}caverns you need gear to fight", "{@color_first}other players and protect yourself", "{@color_first}from the {@color_second}Hostile Mobs&r{@color_first}.", " ", "{@color_fourth}Click me to view Crystals Information.":
             Mining_OpenCrystalsGUI({_plr})
-        make gui slot 16 with shiny diamond pickaxe with no nbt named "{@color_third}Burrow's Pickaxe" with lore "{@color_first}Cost: {@color_second}$15k", " ", "{@color_first}Buy a {@color_second}Burrow's Pickaxe&r {@color_first}here, You", "{@color_first}need it to mine in the caverns.", "{@color_first}This pickaxe is upgradable by", "{@color_second}Right Clicking&r {@color_first}having the pickaxe", "{@color_first}in your hand.", " ", "{@color_fourth}Click me to buy a pickaxe.":
+        make gui slot 16 with shiny diamond pickaxe with no nbt named "{@color_third}Prospector's Pickaxe" with lore "{@color_first}Cost: {@color_second}$15k", " ", "{@color_first}Buy a {@color_second}Prospector's Pickaxe&r {@color_first}here, You", "{@color_first}need it to mine in the caverns.", "{@color_first}This pickaxe is upgradable by", "{@color_second}Right Clicking&r {@color_first}having the pickaxe", "{@color_first}in your hand.", " ", "{@color_fourth}Click me to buy a pickaxe.":
             Mining_OpenPickaxeShopGUI({_plr})
     open last gui to {_plr}
 # --------------[ FUNCTIONS ]-------------- #
@@ -186,16 +191,13 @@ on npc right click:
         send "&r%nl%{@message_prefix} {@color_second}Mining&r {@color_first}gets you {@color_second}crystals, {@color_first}Which you can use to get crate keys, gen slots, and more, At {@color_second}/crystalshop." to player
         wait 4 second
         Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
-        send "&r%nl%{@message_prefix} {@color_first}The {@color_second}Burrow's Pickaxe&r {@color_first}is the tool required to be able to mine, It is upgradable by right clicking when you are holding one." to player
-        wait 4 second
-        Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
-        send "&r%nl%{@message_prefix} {@color_first}The mine contains 3 layers, The last layer has {@color_second}dangerous mobs&r {@color_first}that'll try to kill you! Killing these mobs, Though get you awesome loot, Like crystal boxes, etc." to player
+        send "&r%nl%{@message_prefix} {@color_first}The {@color_second}Prospector's Pickaxe&r {@color_first}is the tool required to be able to mine, It is upgradable by right clicking when you are holding one." to player
         wait 4 second
         Lib_PlaySound(player, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
         send "&r%nl%{@message_prefix} {@color_first}Finally, PvP is enabled in the mines! Be careful, Make sure you are well prepared for combat! And have fun in the mines." to player
         wait 4 second
         Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 1)
-        send "&r%nl%{@message_prefix} {@color_second}Right Click&r {@color_first}me again to open the Mining GUI! I will give you a free 10 minute pass and the {@color_second}Burrow's Pickaxe&r {@color_first}to try out the mine!" to player
+        send "&r%nl%{@message_prefix} {@color_second}Right Click&r {@color_first}me again to open the Mining GUI! I will give you a free 10 minute pass and the {@color_second}Prospector's Pickaxe&r {@color_first}to try out the mine!" to player
         set {mining::player_in_tutorial::%uuid of player%} to false
         set {mining::player_has_interacted::%uuid of player%} to true
         stop
@@ -204,12 +206,9 @@ on npc right click:
 # ENTERING / EXITING MINE REGIONS
 on region enter:
     "%event-region%" contains "mines"
-    set {mining::last_location::%uuid of player%} to location of player
     if {mining::pass_of_player::%uuid of player%} is not set:
-        cancel event
+        execute player command "/warp mine"
         wait 1 tick
-        push player backwards at speed 0.8
-        push player upwards at speed 0.4
         if {mining::player_notified::%uuid of player%} is not set:
             set {mining::player_notified::%uuid of player%} to true
             send subtitle "{@color_error}You don't have a active pass right now!" to player
@@ -226,8 +225,9 @@ every second:
             delete {mining::pass_of_player::%loop-value%}
             Lib_PlaySound({_player}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
             send "{@message_prefix} Your mining pass has expired!" to {_player}
-            teleport {_player} to {mining::last_location::%loop-value%}
             delete {mining::last_location::%loop-value%}
+            if "%region at {_player}%" contains "mines":
+                execute {_player} command "/warp mine"
 # ---------------[ EVENTS ]--------------- #
 
 

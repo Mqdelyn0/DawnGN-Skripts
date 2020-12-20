@@ -1,0 +1,174 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons:
+# Last Updated: 11/17/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+function Leaderboards_Reload():
+    Lib_Broadcast("%nl%{@message_prefix} {@color_first}Reloading the leaderboards! This may cause lag.")
+    set {_top_killers::*} to sorted {pvp::kills::*} from highest to lowest with format "@index^@value"
+    set {_loops} to 3
+    set {_place} to 0
+    loop {_top_killers::*}:
+        add 1 to {_loops}
+        if {_loops} >= 3:
+            set {_split_data} to "%loop-value%"
+            set {_data::*} to {_split_data} split at "^"
+            add 1 to {_place}
+            Holograms_SetLine("kills", {_loops}, "&7##%{_place}% &a%{_data::1} parsed as an offline player% &8- &a%{_data::2}% &fkills")
+            if {_loops} >= 8:
+                stop loop
+    set {_top_deaths::*} to sorted {pvp::deaths::*} from highest to lowest with format "@index^@value"
+    set {_loops} to 3
+    set {_place} to 0
+    loop {_top_deaths::*}:
+        add 1 to {_loops}
+        if {_loops} >= 3:
+            set {_split_data} to "%loop-value%"
+            set {_data::*} to {_split_data} split at "^"
+            add 1 to {_place}
+            Holograms_SetLine("deaths", {_loops}, "&7##%{_place}% &a%{_data::1} parsed as an offline player% &8- &a%Information_MakeFancierNumber({_data::2} parsed as an number)% &fdeaths")
+            if {_loops} >= 8:
+                stop loop
+    set {_top_balance::*} to sorted {lib::balance_money::*} from highest to lowest with format "@index^@value"
+    set {_loops} to 3
+    set {_place} to 0
+    loop {_top_balance::*}:
+        add 1 to {_loops}
+        if {_loops} >= 3:
+            set {_split_data} to "%loop-value%"
+            set {_data::*} to {_split_data} split at "^"
+            add 1 to {_place}
+            Holograms_SetLine("balance", {_loops}, "&7##%{_place}% &a%{_data::1} parsed as an offline player% &8- &a%Information_MakeFancierNumber({_data::2} parsed as an number)% &fbalance")
+            if {_loops} >= 8:
+                stop loop
+    set {_top_crystal::*} to sorted {lib::balance_crystals::*} from highest to lowest with format "@index^@value"
+    set {_loops} to 3
+    set {_place} to 0
+    loop {_top_crystal::*}:
+        add 1 to {_loops}
+        if {_loops} >= 3:
+            set {_split_data} to "%loop-value%"
+            set {_data::*} to {_split_data} split at "^"
+            add 1 to {_place}
+            Holograms_SetLine("crystal", {_loops}, "&7##%{_place}% &a%{_data::1} parsed as an offline player% &8- &a%Information_MakeFancierNumber({_data::2} parsed as an number)% &fcrystals")
+            if {_loops} >= 8:
+                stop loop
+    set {_top_prestige::*} to sorted {leveling::current_prestige::*} from highest to lowest with format "@index^@value"
+    set {_loops} to 3
+    set {_place} to 0
+    loop {_top_prestige::*}:
+        add 1 to {_loops}
+        if {_loops} >= 3:
+            set {_split_data} to "%loop-value%"
+            set {_data::*} to {_split_data} split at "^"
+            add 1 to {_place}
+            Holograms_SetLine("prestige", {_loops}, "&7##%{_place}% &a%{_data::1} parsed as an offline player% &8- &a%Information_MakeFancierNumber({_data::2} parsed as an number)% &fprestiges")
+            if {_loops} >= 8:
+                stop loop
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+every 10 minutes:
+    Leaderboards_Reload()
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+command /reloadlb:
+    permission: *
+    trigger:
+        Leaderboards_Reload()
+
+command /setlb [<string>]:
+    permission: *
+    trigger:
+        if arg-1 = "prestige":
+            Holograms_CreateHologram("prestige", "&a&nPrestiges Leaderboard|&8Top Prestiges on DawnGN|{empty}|&7##1 &akashike_ &8- &a0 &fprestiges|&7##2 &akashike_ &8- &a0 &fprestiges|&7##3 &akashike_ &8- &a0 &fprestiges|&7##4 &akashike_ &8- &a0 &fprestiges|&7##5 &akashike_ &8- &a0 &fprestiges|{empty}|&7&o(( These update ever &n10 minutes&7&o! ))", location of player)
+        if arg-1 = "crystal":
+            Holograms_CreateHologram("crystal", "&a&nCrystals Leaderboard|&8Top Crystals on DawnGN|{empty}|&7##1 &akashike_ &8- &a0 &fcrystals|&7##2 &akashike_ &8- &a0 &fcrystals|&7##3 &akashike_ &8- &a0 &fcrystals|&7##4 &akashike_ &8- &a0 &fcrystals|&7##5 &akashike_ &8- &a0 &fcrystals|{empty}|&7&o(( These update ever &n10 minutes&7&o! ))", location of player)
+        if arg-1 = "balance":
+            Holograms_CreateHologram("balance", "&a&nBalance Leaderboard|&8Top Balances on DawnGN|{empty}|&7##1 &akashike_ &8- &a0 &fbalance|&7##2 &akashike_ &8- &a0 &fbalance|&7##3 &akashike_ &8- &a0 &fbalance|&7##4 &akashike_ &8- &a0 &fbalance|&7##5 &akashike_ &8- &a0 &fbalance|{empty}|&7&o(( These update ever &n10 minutes&7&o! ))", location of player)
+        if arg-1 = "deaths":
+            Holograms_CreateHologram("deaths", "&a&nDeaths Leaderboard|&8Top Deaths on DawnGN|{empty}|&7##1 &akashike_ &8- &a0 &fdeaths|&7##2 &akashike_ &8- &a0 &fdeaths|&7##3 &akashike_ &8- &a0 &fdeaths|&7##4 &akashike_ &8- &a0 &fdeaths|&7##5 &akashike_ &8- &a0 &fdeaths|{empty}|&7&o(( These update ever &n10 minutes&7&o! ))", location of player)
+        if arg-1 = "kills":
+            Holograms_CreateHologram("kills", "&a&nKills Leaderboard|&8Top Killers on DawnGN|{empty}|&7##1 &akashike_ &8- &a0 &fkills|&7##2 &akashike_ &8- &a0 &fkills|&7##3 &akashike_ &8- &a0 &fkills|&7##4 &akashike_ &8- &a0 &fkills|&7##5 &akashike_ &8- &a0 &fkills|{empty}|&7&o(( These update ever &n10 minutes&7&o! ))", location of player)
+# ---------------[ COMMANDS ]--------------- #

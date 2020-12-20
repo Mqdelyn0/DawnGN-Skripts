@@ -206,7 +206,8 @@ function Gens_LoadPlayerData(plr: player):
         set {_type} to loop-value
         loop {_gens::%loop-value%::*}:
             add loop-value-2 to {gens::user_gens::%{_uuid}%::%{_type}%::*}
-    set t to 40 if {gens::user_data::%{_uuid}%::gen_slots} is not set
+    set {gens::user_data::%{_uuid}%::gens_placed} to 0 if {gens::user_data::%{_uuid}%::gens_placed} is not set
+    set {gens::user_data::%{_uuid}%::gen_slots} to 40 if {gens::user_data::%{_uuid}%::gen_slots} is not set
     set {gens::user_is_loaded::%{_uuid}%} to true
     set {gens::user_data::%{_uuid}%::mysql_ongoing} to false
 
@@ -320,11 +321,16 @@ on script load:
     set {gens::gen_data::coal_ore::name} to "&8Coal &7[Tier I]"
     set {gens::gen_data::coal_ore::lores::*} to "", "&7Place this generator on your", "&7plot to start generating &8coal&7!"
     set {gens::gen_data::coal_ore::upgrade_price} to 5000
-    set {gens::gen_data::coal_ore::upgrade_gen} to "THIS_IS_MAX_GENERATOR"
+    set {gens::gen_data::coal_ore::upgrade_gen} to "iron_ore"
     set {gens::gen_data::coal_ore::drop} to shiny coal with no nbt named "&8Coal" with lore "", "&7Sell me by executing &e/sell"
+    set {gens::gen_data::iron_ore::name} to "&7Coal &7[Tier II]"
+    set {gens::gen_data::iron_ore::lores::*} to "", "&7Place this generator on your", "&7plot to start generating &7iron&7!"
+    set {gens::gen_data::iron_ore::upgrade_price} to 5000
+    set {gens::gen_data::iron_ore::upgrade_gen} to "THIS_IS_MAX_GENERATOR"
+    set {gens::gen_data::iron_ore::drop} to shiny coal with no nbt named "&7Coal" with lore "", "&7Sell me by executing &e/sell"
 
 on break:
-    world of player = "plots-s1"
+    # world of player = "plots-s1"
     set {_loc} to location of event-block
     set {_gen_type} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_gen_type} with ""
@@ -333,7 +339,7 @@ on break:
     cancel event
 
 on place:
-    world of player = "plots-s1"
+    # world of player = "plots-s1"
     set {_loc} to location of event-block
     set {_gen_type} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_gen_type} with ""
@@ -346,7 +352,7 @@ on place:
         Gens_OnPlaceGen(player, location of event-block, {_gen_type})
 
 on left click:
-    world of player = "plots-s1"
+    # world of player = "plots-s1"
     set {_loc} to location of event-block
     set {_gen_type} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_gen_type} with ""
@@ -362,7 +368,7 @@ on smelt:
     cancel event
 
 on right click:
-    world of player = "plots-s1"
+    # world of player = "plots-s1"
     set {_loc} to location of event-block
     set {_gen_type} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_gen_type} with ""

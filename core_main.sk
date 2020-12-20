@@ -49,6 +49,11 @@ options:
     # Here you can set the items used in GUIs.
     filler: gray stained glass pane named ""
 
+    # LINKS CONFIGURATION
+    # Set the links that this Skript will use
+    link_webstore: https://dawngn.tebex.io
+    link_discord: https://discord.gg/Cdp4yAR2SV
+
     # LAG PROTECTION CONFIGURATION
     # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
     low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
@@ -60,6 +65,133 @@ options:
 
 # --------------[ FUNCTIONS ]-------------- #
 
+function Main_ChatColor(plr: player, perm: string, color: string, message_color: string):
+    if {_plr} has permission "chatcolor.%{_perm}%":
+        set {_uuid} to uuid of {_plr}
+        close inventory of {_plr}
+        set {core::chat_color::%{_uuid}%} to "%{_color}%"
+        send "{@message_prefix} {@color_first}You set your chat color to %{_message_color}%" to {_plr}
+    if {_plr} does not have permission "chatcolor.%{_perm}%":
+        close inventory of {_plr}
+        send "{@message_prefix} {@color_error}You don't have %{_color}%this {@color_error}color!" to {_plr}
+
+function Main_OpenMainChatColorGUI(plr: player):
+    set {_uuid} to uuid of {_plr}
+    create a gui with virtual chest with 4 rows named "{@color_third}Chat Color":
+        loop 36 times:
+            make next gui slot with {@filler}
+        make gui slot 10 with name tag named "&7GRAY":
+            Main_ChatColor(player, "gray", "&7", "&7Gray")
+        make gui slot 11 with name tag named "&fWHITE":
+            Main_ChatColor(player, "white", "&f", "&fWhite")
+        make gui slot 12 with name tag named "&eYELLOW":
+            Main_ChatColor(player, "yellow", "&e", "&eYellow")
+        make gui slot 13 with name tag named "&cRED":
+            Main_ChatColor(player, "red", "&c", "&cRed")
+        make gui slot 14 with name tag named "&6GOLD":
+            Main_ChatColor(player, "gold", "&6", "&6Gold")
+        make gui slot 15 with name tag named "&aGREEN":
+            Main_ChatColor(player, "green", "&a", "&aGreen")
+        make gui slot 15 with name tag named "&bAQUA":
+            Main_ChatColor(player, "aqua", "&b", "&bAqua")
+        make gui slot 16 with name tag named "&3DARK AQUA":
+            Main_ChatColor(player, "daqua", "&3", "&3Dark Aqua")
+        make gui slot 21 with name tag named "&dPINK":
+            Main_ChatColor(player, "pink", "&d", "&dPink")
+        make gui slot 22 with name tag named "&9LIGHT BLUE":
+            Main_ChatColor(player, "lblue", "&9", "&9Light Blue")
+        make gui slot 23 with name tag named "&5PURPLE":
+            Main_ChatColor(player, "purple", "&5", "&5Purple")
+    open last gui to {_plr}
+
+function Main_CreateChatTag(plr: player, tag: string):
+    set {_uuid} to uuid of {_plr}
+    create a gui with virtual chest with 3 rows named "{@color_third}Confirm Creation Tag":
+        loop 27 times:
+            make next gui slot with {@filler}
+        make gui slot 13 with emerald block named "{@color_second}Confirm Creation" with lore "{@color_first}Tag: {@color_second}%coloured {_tag}%", "", "{@color_fourth}Click me to create the tag", "{@color_fourth}Close out to cancel.":
+            remove 1 from {main::tag_tickets::%{_uuid}%}
+            close inventory of {_plr}
+            Lib_Broadcast("%nl%{@message_prefix} {@color_second}%{_plr}% {@color_first}created chat tag {@color_second}%coloured {_tag}%{@color_first}! Make your own by buying a ticket @ {@color_second}/buy{@color_first}!%nl%")
+            add {_tag} to {main::custom_tags::%{_uuid}%::*}
+    open last gui to {_plr}
+
+function Main_OpenChatTagGUI(plr: player, page: number = 1):
+    set {_uuid} to uuid of {_plr}
+    create a gui with virtual chest with 5 rows named "{@color_third}Chat Tags {@color_fourth}({@color_second}##%{_page}%{@color_fourth})":
+        make gui slot (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44) with {@filler}
+        set {_page} to round {_page}
+        set {_old_page} to {_page} - 1
+        set {_new_page} to {_page} + 1
+        set {_start} to ({_page} * 21) - 20
+        if {_page} >= 2:
+            make gui slot 38 with arrow named "{@color_second}Last Page":
+                Main_OpenChatTagGUI({_plr}, {_old_page})
+        if (size of {main::custom_tags::%{_uuid}%::*}) - 20 > {_start}:
+            make gui slot 42 with arrow named "{@color_second}Next Page":
+                Main_OpenChatTagGUI({_plr}, {_new_page})
+        make gui slot 40 with name tag named "{@color_second}Current Tag" with lore "{@color_first}Tag: {@color_second}%coloured {main::current_tag::%{_uuid}%} ? ""No Tag""%", "", "{@color_fourth}Click me to remove tag":
+            delete {main::current_tag::%{_uuid}%}
+            send "{@message_prefix} You removed your tag!" to {_plr}
+            close inventory of {_plr}
+        set {_loops} to 0
+        set {_slot} to 10
+        loop {main::custom_tags::%{_uuid}%::*}:
+            set {_tag} to loop-value
+            add 1 to {_loops}
+            if {_loops} >= {_start}:
+                if {_slot} = 17 or 26:
+                    add 2 to {_slot}
+                make gui slot {_slot} with enchanted book named "%coloured {_tag}%" with lore "{@color_fourth}Click me to use this tag.":
+                    set {main::current_tag::%{_uuid}%} to " %{_tag}%"
+                    Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+                    send "{@message_prefix} You set your tag to {@color_second}%coloured {_tag}%{@color_first}!" to {_plr}
+                    close inventory of {_plr}
+                add 1 to {_slot}
+                if {_slot} >= 35:
+                    exit loop
+        loop 54 times:
+            make next gui slot with barrier named "{@color_second}&lEMPTY ENTRY" with lore "{@color_fourth}Get a tag @ /buy."
+    open last gui to {_plr}
+
+function Main_OpenAdminChatTagGUI(plr: player, plr_to_view: offline player, page: number = 1):
+    set {_uuid} to uuid of {_plr_to_view}
+    create a gui with virtual chest with 5 rows named "{@color_third}Chat Tags {@color_fourth}({@color_second}##%{_page}%{@color_fourth})":
+        make gui slot (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44) with {@filler}
+        set {_page} to round {_page}
+        set {_old_page} to {_page} - 1
+        set {_new_page} to {_page} + 1
+        set {_start} to ({_page} * 21) - 20
+        if {_page} >= 2:
+            make gui slot 38 with arrow named "{@color_second}Last Page":
+                Main_OpenAdminChatTagGUI({_plr}, {_plr_to_view}, {_old_page})
+        if (size of {main::custom_tags::%{_uuid}%::*}) - 20 > {_start}:
+            make gui slot 42 with arrow named "{@color_second}Next Page":
+                Main_OpenAdminChatTagGUI({_plr}, {_plr_to_view}, {_new_page})
+        make gui slot 40 with name tag named "{@color_second}Current Tag" with lore "{@color_first}Tag: {@color_second}%coloured {main::current_tag::%{_uuid}%} ? ""No Tag""%", "", "{@color_fourth}Click me to remove tag":
+            delete {main::current_tag::%{_uuid}%}
+            send "{@message_prefix} You removed {@color_second}%{_plr_to_view}%{@color_second}'s {@color_first}tag!" to {_plr}
+            Main_OpenAdminChatTagGUI({_plr}, {_plr_to_view}, {_page})
+        set {_loops} to 0
+        set {_slot} to 10
+        loop {main::custom_tags::%{_uuid}%::*}:
+            set {_tag} to loop-value
+            set {_tag_index} to loop-index
+            add 1 to {_loops}
+            if {_loops} >= {_start}:
+                if {_slot} = 17 or 26:
+                    add 2 to {_slot}
+                make gui slot {_slot} with enchanted book named "%coloured {_tag}%" with lore "{@color_fourth}Click me to delete this tag.":
+                    delete {main::custom_tags::%{_uuid}%::%{_tag_index}%}
+                    Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+                    send "{@message_prefix} You deleted {@color_second}%coloured {_tag}%{@color_first}!" to {_plr}
+                    Main_OpenAdminChatTagGUI({_plr}, {_plr_to_view}, {_page})
+                add 1 to {_slot}
+                if {_slot} >= 35:
+                    exit loop
+        loop 54 times:
+            make next gui slot with barrier named "{@color_second}&lEMPTY ENTRY" with lore "{@color_fourth}Nothing..."
+    open last gui to {_plr}
 
 # --------------[ FUNCTIONS ]-------------- #
 
@@ -86,8 +218,10 @@ on unload:
 
 on join:
     set join message to ""
+    execute player command "/spawn"
     wait 1 tick
     player is online
+    execute player command "/spawn"
     Lib_PlaySound(player, "BLOCK_NOTE_BLOCK_PLING", 0.1)
     loop 1000 times:
         send " " to player
@@ -99,7 +233,7 @@ on join:
         set {leveling::current_rebirth::%player's uuid%} to 0
         Money_Set(player, 0)
         Crystals_Set(player, 0)
-        add uuid of player to {main::joined_players::*}
+        set {main::joined_players::%uuid of player%} to uuid of player
         send "{@message_borders}" to player
         send "{@color_first}Welcome to {@color_third}DawnGN! {@color_first}%player%" to player
         send "{@color_first}You are the {@color_second}%size of {main::joined_players::*}%{@color_second}th {@color_first}join!" to player
@@ -155,17 +289,111 @@ on join:
             broadcast "{@color_third}&lDONATOR JOIN {@color_fourth}| {@color_second}%player%"
 
 on quit:
+    set quit message to ""
     if player has permission "staff":
         broadcast "{@color_third}&lSTAFF LEAVE {@color_fourth}| {@color_second}%player%"
         stop
     if player has permission "donator":
         broadcast "{@color_third}&lDONATOR LEAVE {@color_fourth}| {@color_second}%player%"
 
+on respawn:
+    execute player command "/spawn"
+    wait 1 tick
+    execute player command "/spawn"
+
+on chat:
+    set chat format to "&8[&a%{leveling::current_prestige::%player's uuid%}%-&a&o%{leveling::current_level::%player's uuid%}%&8] %player's prefix%%player's displayname%%coloured {main::current_tag::%uuid of player%} ? """"%&f: %coloured {core::chat_color::%uuid of player%} ? ""&7""%%message%"
 # ---------------[ EVENTS ]--------------- #
 
 
 
 # ---------------[ COMMANDS ]--------------- #
 
+command /chatcolor:
+    trigger:
+        Main_OpenMainChatColorGUI(player)
 
+command /createtag [<string>]:
+    trigger:
+        if {main::tag_tickets::%uuid of player%} is not greater than 0:
+            Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+            send "{@message_prefix} {@color_error}You need a ticket for this! Get one @ {@color_second}/buy{@color_error}!" to player
+            stop
+        if arg-1 is not set:
+            Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+            set {_message} to "{@error_wrong_usage}"
+            replace "<arg>" in {_message} with "/createtag &8[&d&lSIMP&8]"
+            send {_message} to sender
+            stop
+        Main_CreateChatTag(player, arg-1)
+
+command /givetag [<offline player>] [<string>] [<string>]:
+    trigger:
+        if sender does not have permission "tags.give_custom":
+            Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+            set {_message} to "{@error_no_permission}"
+            replace "<arg>" in {_message} with "tags.give_custom"
+            send {_message} to sender
+            stop
+        if arg-1 = "help":
+            send "{@message_borders}" to sender
+            send "{@color_second}/givetag (player) ticket (amount)" to sender
+            send "{@color_second}/givetag (player) tag (tag)" to sender
+            send "{@message_borders}" to sender
+            stop
+        if arg-1 or arg-2 or arg-3 is not set:
+            Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+            set {_message} to "{@error_wrong_usage}"
+            replace "<arg>" in {_message} with "/givetag yawyann ticket 1"
+            send {_message} to sender
+            stop
+        if arg-2 = "ticket":
+            set {_amount} to arg-3 parsed as an integer
+            if {_amount} is not set:
+                Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+                set {_message} to "{@error_not_correct_type}"
+                replace "<arg>" in {_message} with arg-3
+                replace "<type>" in {_message} with "Integer"
+                send {_message} to sender
+                stop
+            if {main::joined_players::*} does not contain uuid of arg-1:
+                Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1.0)
+                send "{@message_prefix} {@color_second}%arg-1% {@color_error}never played before!" to sender
+                stop
+            add {_amount} to {main::tag_tickets::%uuid of arg-1%}
+            send "{@message_prefix} You gave {@color_second}%arg-1% {@color_second}%{_amount}% {@color_first}tag tickets!" to sender
+            Lib_Broadcast("%nl%{@message_prefix} {@color_second}%arg-1% {@color_first}got {@color_second}%arg-3% {@color_first}ticket tag(s)! Get your own @ {@color_second}/buy{@color_first}%nl%")
+            stop
+        if arg-2 = "tag":
+            add arg-3 to {main::tag_tickets::%uuid of arg-1%}
+            Lib_Broadcast("%nl%{@message_prefix} {@color_second}%arg-1% {@color_first}got chat tag{@color_second}%arg-3% {@color_first}! Get your own @ {@color_second}/buy{@color_first}%nl%")
+            stop
+
+command /tags:
+    trigger:
+        Main_OpenChatTagGUI(player)
+
+command /viewtags [<offline player>]:
+    permission: *
+    trigger:
+        Main_OpenAdminChatTagGUI(player, arg-1)
+
+command /buy:
+    aliases: store, webstore
+    trigger:
+        send "{@message_prefix} {@color_first}Visit our webstore here {@color_second}{@link_webstore}"
+
+command /discord:
+    aliases: disc
+    trigger:
+        send "{@message_prefix} {@color_first}Visit our discord here {@color_second}{@link_discord}"
+
+command /setspawn:
+    permission: *
+    trigger:
+        set {main::spawn_point} to location of player
+
+command /spawn:
+    trigger:
+        teleport player to {main::spawn_point}
 # ---------------[ COMMANDS ]--------------- #

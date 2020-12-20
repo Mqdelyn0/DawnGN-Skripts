@@ -1,0 +1,154 @@
+# ----------[ AUTHOR INFORMATION ]---------- #
+# Discord Tag: kashike_#0001
+# Discord Server: https://discord.gg/MJ7q6BZ4Wx
+# Minecraft User: kashike_
+# Github: https://github.com/kashike1
+# ----------[ AUTHOR INFORMATION ]---------- #
+#
+#
+#
+# ----------[ SKRIPT INFORMATION ]---------- #
+# Server Version: Paper 1.16.4
+# Skript Addons:
+# Last Updated: 11/17/20
+# Current Version: 0.1.0
+# ----------[ SKRIPT INFORMATION ]---------- #
+
+
+
+# ------------[ CONFIGURATION ]------------ #
+
+options:
+
+    # MESSAGES CONFIGURATION
+    message_prefix: &2&lDawnGN &8¬&7
+    message_borders: &8&m                                                &r
+
+    # COLORS CONFIGURATION
+    color_first: &7
+    color_second: &a
+    color_third: &2
+    color_fourth: &8
+    color_error: &c
+
+    # ERRORS CONFIIGURATION
+    # Use <arg> for the permission, correct usage, or incorrect type. <type> for the "error_not_correct_type"
+    error_no_permission: &r%nl%&c&l(!) &cI can't let you do that!%nl%&c&l(!) &cMissing Permission: &a<arg>&r%nl%
+    error_not_player: &r%nl%&c&l(!) &cOnly players can execute this command!&r%nl%
+    error_wrong_usage: &r%nl%&c&l(!) &cIncorrect Usage!%nl%&c&l(!) &cCorrect Usage: &a<arg>&r%nl%
+    error_not_correct_type: &r%nl%&c&l(!) &a<arg> &cisn't the required type! &8(&a<type>&8)&r%nl%
+
+    # ALERTS CONFIGURATION
+    # Use <script> for the skript file, And <reload_time> for the reloaded time.
+    alerts_reload_enabled: true
+    alerts_reload_message: &r%nl%&c&l(!) &a<script>.sk &7reloaded in &a<reload_time>!%nl%&r
+    alerts_reloading_enabled: true
+    alerts_reloading_message: &r%nl%&c&l(!) &a<script>.sk &7is being reloaded! This may cause lag.%nl%&r
+
+    # GUI ITEMS CONFIGURATION
+    # Here you can set the items used in GUIs.
+    filler: gray stained glass pane named ""
+
+    # LAG PROTECTION CONFIGURATION
+    # These options are for the "algorithm" that should hopefully reduce lag caused by this Skript.
+    low_lag_protection: 0.1 + ((20 - tps from the last minute) / 4) * 2 # These are used for code that generally isn't intensive, So you can leave it at pretty low numbers.
+    medium_lag_protection: 1.5 + ((20 - tps from the last minute) / 2) * 2 # These are used for code that are kind of intensive, Like hologram reloading, Loops, And what not.
+    high_lag_protection: 6 + (20 - tps from the last minute) * 2 # These are used for code that are what I think, really intensive, Like setting a lot of blocks, Or just in simple codes, YANDEREDEV CODE TYPE SHIT
+# ------------[ CONFIGURATION ]------------ #
+
+
+
+# --------------[ FUNCTIONS ]-------------- #
+
+function Boxes_Open(plr: player, type: string, amount: number):
+    set {_uuid} to uuid of {_plr}
+    set {_string_to_split} to "%{_amount}%"
+    set {_strings::*} to {_string_to_split} split at ""
+    set {_strings::0} to ""
+    loop {_strings::*}:
+        delete {_strings::%loop-index%}
+        set {_obfuscated} to "&k0&k0&k0&k0&k0&k0&k0&k0&k0&k0"
+        set {_string} to "%{_string} ? """"%%loop-value%"
+        delete {_size}
+        set {_size} to (size of {_strings::*} * 3) - 3 if (size of {_strings::*} * 3) - 3 > 0
+        delete {_still_hidden}
+        set {_still_hidden} to last {_size} characters of {_obfuscated} ? ""
+        if {_type} = "crystals":
+            send title "{@color_third}&lOPENING..." with subtitle "{@color_first}You got {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}✦ {@color_first}crystals!" to {_plr} with fadein 0 seconds and fadeout 0 seconds
+        else if {_type} = "money":
+            send title "{@color_third}&lOPENING..." with subtitle "{@color_first}You got {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}${@color_first}!" to {_plr} with fadein 0 seconds and fadeout 0 seconds
+        Lib_PlaySound({_plr}, "BLOCK_NOTE_BLOCK_PLING", 0.1)
+        wait 1 second
+        if size of {_strings::*} <= 1:
+            stop loop
+    Lib_PlaySound({_plr}, "ENTITY_EXPERIENCE_ORB_PICKUP", 0.1)
+    delete {boxes::opening::%{_uuid}%}
+    if {_type} = "crystals":
+        Crystals_Add({_plr}, {_amount})
+        send subtitle "{@color_first}You opened a crystal box for {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}✦ {@color_first}crystals!" to {_plr} with fadein 0 seconds and fadeout 1 seconds
+    else if {_type} = "money":
+        Money_Add({_plr}, {_amount})
+        send subtitle "{@color_first}You opened a money box for {@color_second}%{_string}%%{_still_hidden} ? """"%{@color_second}${@color_first}!" to {_plr} with fadein 0 seconds and fadeout 1 seconds
+
+function Boxes_GiveBox(plr: player, type: string, rarity: string):
+    set {_item} to ender chest with no nbt
+    set name of {_item} to "&5Crystals &dBox" if {_type} = "crystals"
+    set name of {_item} to "&2Money &aBox" if {_type} = "money"
+    set {_rarity} to "&7Common" if {_rarity} = "common"
+    set {_rarity} to "&fUncommon" if {_rarity} = "uncommon"
+    set {_rarity} to "&eRare" if {_rarity} = "rare"
+    set {_rarity} to "&aEpic" if {_rarity} = "epic"
+    set {_rarity} to "&2Legendary" if {_rarity} = "legendary"
+    add "{Type:""money"",Rarity:""%uncoloured {_rarity}%""}" to nbt of {_item} if {_type} = "money"
+    add "{Type:""crystals"",Rarity:""%uncoloured {_rarity}%""}" to nbt of {_item} if {_type} = "crystals"
+    set lore of {_item} to "{@color_fourth}Rarity: {@color_first}%coloured {_rarity}%|| &8 ||{@color_fourth}Right Click to open me."
+    give {_item} to {_plr}
+
+# --------------[ FUNCTIONS ]-------------- #
+
+
+
+# ---------------[ EVENTS ]--------------- #
+
+# LOAD / UNLOAD MESSAGE
+on load:
+    if {@alerts_reload_enabled} = true:
+        if {lib::unload_time} is not set:
+            set {lib::unload_time} to now
+        set {_message} to "{@alerts_reload_message}"
+        replace "<script>" in {_message} with script
+        replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
+        Lib_Broadcast({_message})
+
+on unload:
+    set {lib::unload_time} to now
+    if {@alerts_reloading_enabled} = true:
+        set {_message} to "{@alerts_reloading_message}"
+        replace "<script>" in {_message} with script
+        Lib_Broadcast({_message})
+
+on right click with ender chest:
+    name of player's tool contains "Box"
+    cancel event
+    {boxes::opening::%uuid of player%} is not set
+    set {boxes::opening::%uuid of player%} to true
+    set {_rarity} to tag "Rarity" of nbt of player's tool
+    set {_type} to tag "Type" of nbt of player's tool
+    set {_amount} to a random integer between 100 and 500 if {_rarity} = "common"
+    set {_amount} to a random integer between 500 and 1500 if {_rarity} = "uncommon"
+    set {_amount} to a random integer between 1500 and 4500 if {_rarity} = "rare"
+    set {_amount} to a random integer between 4500 and 13500 if {_rarity} = "epic"
+    set {_amount} to a random integer between 13500 and 40500 if {_rarity} = "legendary"
+    set {_amount} to {_amount} * 10 if {_type} = "money"
+    set {_amount} to {_amount} / 10 if {_type} = "crystals"
+    broadcast "%{_amount}% // %{_type}% // %{_rarity}%"
+    remove 1 of player's tool from inventory of player
+    Boxes_Open(player, {_type}, {_amount})
+# ---------------[ EVENTS ]--------------- #
+
+
+
+# ---------------[ COMMANDS ]--------------- #
+
+
+# ---------------[ COMMANDS ]--------------- #

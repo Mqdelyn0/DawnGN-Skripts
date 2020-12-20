@@ -231,7 +231,7 @@ function Crystals_Add(plr: player, add_bal: number):
 function Crystals_Remove(plr: player, take_bal: number):
     {_take_bal} > 0
     set {_uuid} to uuid of {_plr}
-    remove {_add_bal} from {lib::balance_crystals::%{_uuid}%}
+    remove {_take_bal} from {lib::balance_crystals::%{_uuid}%}
 
 function Grains_Get(plr: player) :: number:
     set {_uuid} to uuid of {_plr}
@@ -249,29 +249,46 @@ function Grains_Add(plr: player, add_bal: number):
 function Grains_Remove(plr: player, take_bal: number):
     {_take_bal} > 0
     set {_uuid} to uuid of {_plr}
-    remove {_add_bal} from {lib::balance_grains::%{_uuid}%}
+    remove {_take_bal} from {lib::balance_grains::%{_uuid}%}
 
 # MAKE TIME LOOK BETTER
 function Information_MakeFancierTime(time: timespan) :: string:
     set {_fancier_time} to "%{_time}%"
-    replace " seconds" in {_fancier_time} with "s"
-    replace " second" in {_fancier_time} with "s"
-    replace " minutes" in {_fancier_time} with "m"
-    replace " minute" in {_fancier_time} with "m"
-    replace " weeks" in {_fancier_time} with "w"
-    replace " week" in {_fancier_time} with "w"
-    replace " months" in {_fancier_time} with "mo"
-    replace " month" in {_fancier_time} with "mo"
-    replace "and" in {_fancier_time} with " "
+    replace all " seconds" or " second" in {_fancier_time} with "s"
+    replace all " minutes" or " minute" in {_fancier_time} with "m"
+    replace all " hours" or " hour" in {_fancier_time} with "h"
+    replace all " days" or " day" in {_fancier_time} with "d"
+    replace all " weeks" or " week" in {_fancier_time} with "w"
+    replace all " and" or "and" or "and " or " and " in {_fancier_time} with " "
+    replace all "  " in {_fancier_time} with " "
     return {_fancier_time}
 
+# GET TIME FROM STRING
+function Time_ConvertString(str_to_convert: string) :: timespan:
+    set {_convert} to {_str_to_convert}
+    replace "m" in {_conert} with " month"
+    replace "w" in {_convert} with " week"
+    replace "d" in {_convert} with " day"
+    replace "h" in {_convert} with " hour"
+    replace "m" in {_convert} with " minute"
+    replace "s" in {_convert} with " second"
+    replace "_" in {_convert} with " and "
+    return {_convert} parsed as an timespan
+
+# MAKE NUMBER LOOK BETTER
 function Information_MakeFancierNumber(n: number) :: string:
     set {_l::*} to split "k|M|B|T|Qn|Qi|Sx" at "|"
     set {_i} to min(floor(log({_n})/3), size of {_l::*})
     return "%{_n}%" if {_i} <= 0
     set {_i2} to 1000^{_i}
     return "%{_n}/{_i2}%%{_l::%{_i}%}%"
-    
+
+function Staff_AlertStaff(message: string):
+    loop all players:
+        loop-player has permission "staff.alerts_see"
+        send "&2&lALERTS &8| &f%{_message}%" to loop-player
+
+# PROGRESS BAR TO SHOW PROGRESS
 function Information_ProgressBar(int: integer, max: integer, barsize: integer) :: string:
     stop if {_int} < 0
     stop if {_max} < 0
@@ -291,7 +308,7 @@ on load:
     set {lib::server_restarted} to false
     if {@alerts_reload_enabled} = true:
         if {lib::unload_time} is not set:
-            set {lib::unload_time} to now
+            set {lib::unload_time} to now 
         set {_message} to "{@alerts_reload_message}"
         replace "<script>" in {_message} with script
         replace "<reload_time>" in {_message} with "%difference between {lib::unload_time} and now%"
@@ -311,4 +328,11 @@ on tab complete of "/sk" or "/skript":
         set tab completions for position 2 to enabled scripts
     if tab arg-1 = "enable":
         set tab completions for position 2 to disabled scripts
+
+every 1 minute:
+    Holograms_LoadAllHolograms()
+    wait 1 tick
+    Holograms_UnloadAllHolograms()
+    wait 1 tick
+    Holograms_LoadAllHolograms()
 # ---------------[ EVENTS ]--------------- #

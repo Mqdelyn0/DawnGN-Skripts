@@ -89,26 +89,11 @@ on unload:
 
 # ---------------[ COMMANDS ]--------------- #
 
-command /stats [<offline player>]:
-    aliases: /balance, /bal, /crystals, /crystal
+command /options:
     trigger:
-        send "{@message_borders}" to player
-        send "{@color_third}Player Stats: {@color_second}%arg-1%" to player
-        send "" to player
-        send "{@color_third}Balances:" to player
-        send "{@color_fourth}¬ {@color_first}Money: &a%Information_MakeFancierNumber(Money_Get(arg-1))%" to player
-        send "{@color_fourth}¬ {@color_first}Crystals: &d%Information_MakeFancierNumber(Crystals_Get(arg-1))%" to player
-        send "" to player
-        send "{@color_third}PvP Stats:" to player
-        send "{@color_fourth}¬ {@color_first}Kills: {@color_second}%{pvp::kills::%uuid of arg-1%}%" to player
-        send "{@color_fourth}¬ {@color_first}Deaths: {@color_second}%{pvp::deaths::%uuid of arg-1%}%" to player
-        send "{@color_fourth}¬ {@color_first}KDR: {@color_second}%{pvp::kdr::%uuid of arg-1%}%" to player
-        send "{@color_fourth}¬ {@color_first}Killstreak: {@color_second}%{pvp::killstreak::%uuid of arg-1%}%" to player
-        send "{@color_fourth}¬ {@color_first}Highest Killstreak: {@color_second}%{pvp::highest_killstreak::%uuid of arg-1%}%" to player
-        send "" to player
-        send "{@color_third}Others:" to player
-        send "{@color_fourth}¬ {@color_first}Rank: {@color_second}%arg-1's prefix%" to player
-        send "{@color_fourth}¬ {@color_first}Gens: {@color_second}%{gens::user_data::%uuid of arg-1%::gens_placed}%{@color_fourth}/{@color_second}%{gens::user_data::%uuid of arg-1%::gen_slots}%" to player
-        send "{@color_fourth}¬ {@color_first}Multiplier: {@color_second}%{shop::multiplier::%uuid of arg-1%}%" to player
-        send "{@message_borders}" to player
+        create a gui with virtual chest with 3 rows named "{@color_third}Options":
+            loop 27 times:
+                make next gui slot with {@filler}
+            make gui slot 10 with "{@color_third}"
+        open last gui to player
 # ---------------[ COMMANDS ]--------------- #

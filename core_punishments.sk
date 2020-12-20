@@ -266,7 +266,6 @@ on script unload:
     set {punishments::unload_time} to now
 
 on chat:
-    set chat format to "&8[&a%{leveling::current_prestige::%player's uuid%}%&8] &8[&a&o%{leveling::current_level::%player's uuid%}%&8] %player's prefix%%player%&f: %coloured {core::chat_color::%uuid of player%} ? ""&7""%%message%"
     if {punishments::player_muted::%uuid of player%} is set:
         cancel event
         Lib_PlaySound(player, "ENTITY_VILLAGER_NO", 1)
@@ -316,7 +315,7 @@ on join:
     wait 1 tick
     {punishments::player_banned::%uuid of player%} is set
     set {_time} to Information_MakeFancierTime(difference between {punishments::player_muted_start::%uuid of player%} and now)
-    kick player due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been banned from &5&lVANITYPR!%nl%{@color_first}Length: {@color_second}%{_time}%%nl%{@color_first}&oAppeal on our discord! {@color_fourth}({@color_second}{@discord_link}{@color_fourth})%nl%{@message_borders}"
+    kick player due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been banned from &2DawnGN!%nl%{@color_first}Length: {@color_second}%{_time}%%nl%{@color_first}&oAppeal on our discord! {@color_fourth}({@color_second}{@discord_link}{@color_fourth})%nl%{@message_borders}"
 
 # -------- #
 #  EVENTS  #
@@ -418,7 +417,7 @@ command /mute [<offline player>] [<string>] [<string>]:
             replace "(0)" in {_message} with "/mute yawyann 1h_1m stop spamming"
             send {_message} to sender
             stop
-        if arg-1 has not played before:
+        if {main::joined_players::%uuid of arg-1%} is not set:
             Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1)
             send "{@prefix} {@color_second}%arg-1% {@color_error}has not played before!" to sender
             stop
@@ -467,7 +466,7 @@ command /unmute [<offline player>] [<string>]:
             replace "(0)" in {_message} with "/unmute yawyann stopped spamming"
             send {_message} to sender
             stop
-        if arg-1 has not played before:
+        if {main::joined_players::%uuid of arg-1%} is not set:
             Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1)
             send "{@prefix} {@color_second}%arg-1% {@color_error}has not played before!" to sender
             stop
@@ -505,7 +504,7 @@ command /kick [<offline player>] [<string>]:
             stop
         set {_punishment_data} to "%sender%|%now%|%arg-2%"
         add {_punishment_data} to {punishments::punishment_kicks::%uuid of arg-1%::*}
-        kick player due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been kicked from &5&lVANITYPR!%nl%{@color_first}Moderator: {@color_second}%sender%%nl%{@color_first}Reason: {@color_second}%arg-2%%nl%{@message_borders}"
+        kick arg-1 due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been kicked from &5&lVANITYPR!%nl%{@color_first}Moderator: {@color_second}%sender%%nl%{@color_first}Reason: {@color_second}%arg-2%%nl%{@message_borders}"
         send "{@prefix} {@color_second}Moderation" to all players
         send "{@message_borders}" to all players
         send "{@color_second}%arg-1% {@color_first}has been kicked!" to all players
@@ -527,7 +526,7 @@ command /ban [<offline player>] [<string>] [<string>]:
             replace "(0)" in {_message} with "/ban yawyann 1h stop hacking"
             send {_message} to sender
             stop
-        if arg-1 has not played before:
+        if {main::joined_players::%uuid of arg-1%} is not set:
             Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1)
             send "{@prefix} {@color_second}%arg-1% {@color_error}has not played before!" to sender
             stop
@@ -550,7 +549,7 @@ command /ban [<offline player>] [<string>] [<string>]:
             Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1)
             send "{@prefix} {@color_second}%arg-1% {@color_error}is already muted!" to sender
             stop
-        kick player due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been banned from &5&lVANITYPR!%nl%{@color_first}Moderator: {@color_second}%sender%%nl%{@color_first}Reason: {@color_second}%arg-2%%nl%{@color_first}Length: {@color_second}%Information_MakeFancierTime({_time})%%nl%%nl%{@color_first}&oAppeal on our discord! {@color_fourth}({@color_second}{@discord_link}{@color_fourth})%nl%{@message_borders}"
+        kick arg-1 due to "{@prefix} {@color_second}Moderation%nl%{@message_borders}%nl%{@color_first}You have been banned from &5&lVANITYPR!%nl%{@color_first}Moderator: {@color_second}%sender%%nl%{@color_first}Reason: {@color_second}%arg-2%%nl%{@color_first}Length: {@color_second}%Information_MakeFancierTime({_time})%%nl%%nl%{@color_first}&oAppeal on our discord! {@color_fourth}({@color_second}{@discord_link}{@color_fourth})%nl%{@message_borders}"
         send "{@prefix} {@color_second}Moderation" to all players
         send "{@message_borders}" to all players
         send "{@color_second}%arg-1% {@color_first}has been banned!" to all players
@@ -577,7 +576,7 @@ command /unban [<offline player>] [<string>]:
             replace "(0)" in {_message} with "/unban yawyann stopped hacking"
             send {_message} to sender
             stop
-        if arg-1 has not played before:
+        if {main::joined_players::%uuid of arg-1%} is not set:
             Lib_PlaySound(sender, "ENTITY_VILLAGER_NO", 1)
             send "{@prefix} {@color_second}%arg-1% {@color_error}has not played before!" to sender
             stop

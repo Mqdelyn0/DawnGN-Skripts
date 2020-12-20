@@ -52,32 +52,34 @@ options:
 
 # SCOREBOARD UPDATE FUNCTION
 function Scoreboard_UpdateBoard(plr: player):
-    set {_upper} to "%{_plr}%" in uppercase
     set {_uuid} to uuid of {_plr}
-    set line 15 of {_plr}'s scoreboard to " "
-    set line 14 of {_plr}'s scoreboard to "&2&l%{_upper}%"
-    set line 13 of {_plr}'s scoreboard to " &8&l| &fGens: &b0/40"
-    set line 12 of {_plr}'s scoreboard to " &8&l| &fMoney: &a$%Information_MakeFancierNumber(Money_Get({_plr}))%"
-    set line 11 of {_plr}'s scoreboard to " &8&l| &fCrystals: &d0✦"
-    set line 10 of {_plr}'s scoreboard to " &8&l| &fGrains: &e0✿"
-    set line 9 of {_plr}'s scoreboard to " "
+    set line 15 of {_plr}'s scoreboard to ""
+    set line 14 of {_plr}'s scoreboard to "&2&lPlayer Info:"
+    set line 13 of {_plr}'s scoreboard to "&a&l● &fGens: &b0/40"
+    set line 12 of {_plr}'s scoreboard to "&a&l● &fMoney: &a$%Information_MakeFancierNumber(Money_Get({_plr}))%"
+    set line 11 of {_plr}'s scoreboard to "&a&l● &fCrystals: &d%Information_MakeFancierNumber(Crystals_Get({_plr}))%✦"
+    set line 10 of {_plr}'s scoreboard to "&a&l● &fMultiplier: &a%{shop::multiplier::%{_uuid}%}%x"
+    set line 9 of {_plr}'s scoreboard to "&a&l● &fLevel: &a%{leveling::current_level::%{_uuid}%}% &8(&a%{leveling::current_exp::%{_uuid}%}%&axp&8)"
+    set line 8 of {_plr}'s scoreboard to " "
+    set line 3 of {_plr}'s scoreboard to " "
+    set line 2 of {_plr}'s scoreboard to "&7&oDawnGN.tebex.io"
     if "%region at {_plr}%" contains "farming":
-        set line 8 of {_plr}'s scoreboard to "&6&lFARMING"
-        set line 7 of {_plr}'s scoreboard to " &8&l| &fPass: &e1h, 58m, 53s"
-        set line 6 of {_plr}'s scoreboard to " &8&l| &fBackpack: &e21/100"
+        set line 7 of {_plr}'s scoreboard to "&6&lFarming Info"
+        set line 6 of {_plr}'s scoreboard to " &8&l| &fPass: &e1h, 58m, 53s"
+        set line 5 of {_plr}'s scoreboard to " &8&l| &fBackback: &e21/100"
         set line 5 of {_plr}'s scoreboard to " &8&l| &fWorth: &e59✿"
         stop
     else if "%region at {_plr}%" contains "mines":
-        set line 8 of {_plr}'s scoreboard to "&5&lMINING"
-        set line 7 of {_plr}'s scoreboard to " &8&l| &fPass: &d%Information_MakeFancierTime({mining::pass_of_player::%{_uuid}%}) ? ""No Pass""%"
-        set line 6 of {_plr}'s scoreboard to " &8&l| &fBackpack: &d21/100"
-        set line 5 of {_plr}'s scoreboard to " &8&l| &fWorth: &d59✿"
+        set line 7 of {_plr}'s scoreboard to "&5&lMining Info"
+        set line 6 of {_plr}'s scoreboard to "&8&l| &fPass: &d%Information_MakeFancierTime({mining::pass_of_player::%{_uuid}%}) ? ""No Pass""%"
+        set line 5 of {_plr}'s scoreboard to "&8&l| &fBackpack: &d%Information_MakeFancierNumber(Backpack_GetAmountOfItems({_plr}))%/%Information_MakeFancierNumber({backpack::max_slots::%{_uuid}%})%"
+        set line 4 of {_plr}'s scoreboard to "&8&l| &fWorth: &d%Information_MakeFancierNumber(Backpack_GetWholeWorth({_plr}))%✦"
         stop
     else:
-        set line 8 of {_plr}'s scoreboard to "&2&lSERVER"
-        set line 7 of {_plr}'s scoreboard to " &8&l| &fOnline: &a%number of all players%/75"
-        set line 6 of {_plr}'s scoreboard to " &8&l| &fLogins: &a%number of all offline players%"
-        set line 5 of {_plr}'s scoreboard to " &8&l| &fTPS: &a%tps from the last minute%"
+        set line 7 of {_plr}'s scoreboard to "&2&lServer Info"
+        set line 6 of {_plr}'s scoreboard to "&8&l| &fOnline: &a%number of all players%/75"
+        set line 5 of {_plr}'s scoreboard to "&8&l| &fLogins: &a%size of {main::joined_players::*}%"
+        set line 4 of {_plr}'s scoreboard to "&8&l| &fTPS: &a%tps from the last minute%"
         stop
 # --------------[ FUNCTIONS ]-------------- #
 
@@ -105,8 +107,9 @@ on unload:
 # DO SCOREBOARD ANIMATION & UPDATE
 every 28 ticks:
     loop all players:
+        toggle scoreboard of loop-player on
         loop {scoreboard::title::*}:
-            set title of loop-player's scoreboard to "   %loop-value-2% &8| &aSeason I   "
+            set title of loop-player's scoreboard to "%loop-value-2%"
             wait 2 ticks
         Scoreboard_UpdateBoard(loop-player)
         wait 1 tick

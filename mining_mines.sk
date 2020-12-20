@@ -84,6 +84,7 @@ function Mines_RemvoeBlock(id: string, block: itemtype):
 # RESET A SPECIFIC MINE 
 function Mines_ResetMine(id: string):
     if {mines::created_mines::%{_id}%::*} is set:
+        set {mines::created_mines::%{_id}%::reset_time} to now
         Lib_Broadcast("&r%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}is resetting! This might cause lag.%nl%&r")
         if {mines::created_mines::%{_id}%::blocks_to_reset::*} is not set:
             loop all blocks within bound with id "mines_%{_id}%":
@@ -96,18 +97,33 @@ function Mines_ResetMine(id: string):
         loop indices of {mines::created_mines::%{_id}%::blocks::*}:
             set {_chances::%loop-value%} to {mines::created_mines::%{_id}%::blocks::%loop-value%::chance}
         set {_size} to size of {mines::created_mines::%{_id}%::blocks_to_reset::*}
+        set {_timer} to now
         loop {mines::created_mines::%{_id}%::blocks_to_reset::*}:
-            block at loop-value = bedrock or stone
+            if difference between {_timer} and now >= 30 seconds:
+                set {_timer} to now
+                Lib_Broadcast("%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}is randomizing for it's reset! {@color_fourth}({@color_second}%loop-index%{@color_fourth}/{@color_second}%size of {mines::created_mines::%{_id}%::blocks_to_reset::*}%{@color_fourth})")
+            if tps from the last minute <= 15:
+                while tps from the last minute <= 15:
+                    Lib_Broadcast("%nl%{@message_prefix} {@color_first}It is too laggy for {@color_second}%{_id}% {@color_first}to reset, It has been paused.")
+                    wait 1 minute
+            # block at loop-value = bedrock or stone
             add loop-value to {_locations_to_randomize::*}
             set {_chance} to {@high_lag_protection}
             chance of {_chance}%:
-                wait 1 tick
+                wait ("%round(1 + (20 - tps from the last minute)) * 4% ticks" parsed as an timespan) ? 1 tick
         loop indices of {_chances::*}:
             set {_needed_blocks_to_set::%loop-value%} to round({_size} * ({_chances::%loop-value%} / 100))
         set {_loops} to 0
         set {_on_going} to false
         set {_setted_blocks} to 0
+        set {_timer} to now
         loop size of {_locations_to_randomize::*} times:
+            if difference between {_timer} and now >= 30 seconds:
+                set {_timer} to now
+                Lib_Broadcast("%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}is still setting blocks! {@color_fourth}({@color_second}%size of {_locations_to_randomize::*}% {@color_first}remaining{@color_fourth})")
+            if tps from the last minute <= 15:
+                while tps from the last minute <= 15:
+                    wait 1 minute
             set {_loc} to random element out of {_locations_to_randomize::*}
             remove {_loc} from {_locations_to_randomize::*}
             if {_on_going} = false:
@@ -131,8 +147,8 @@ function Mines_ResetMine(id: string):
                     set {_loops} to 0
             set {_chance} to {@high_lag_protection}
             chance of {_chance}%:
-                wait 1 tick
-        Lib_Broadcast("&r%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}has resetted {@color_second}%{_setted_blocks}% {@color_first}blocks! Visit it at {@color_second}/warps{@color_first}.%nl%&r")
+                wait ("%round(1 + (20 - tps from the last minute)) * 4% ticks" parsed as an timespan) ? 1 tick
+        Lib_Broadcast("&r%nl%{@message_prefix} {@color_second}%{_id}% {@color_first}has resetted {@color_second}%{_setted_blocks}% {@color_first}blocks in {@color_second}%Information_MakeFancierTime(difference between {mines::created_mines::%{_id}%::reset_time} and now)%{@color_first}! Visit it at {@color_second}/warps{@color_first}.%nl%&r")
 
 # BOUNDS FUNCTIONS
 function Mines_CreateBounds(id: string, pos_1: location, pos_2: location):
@@ -188,16 +204,18 @@ on block break:
     set {_edited_block} to "%event-block%"
     replace all "southward ", "northward ", "westward ", "eastward " in {_edited_block} with ""
     replace all " " in {_edited_block} with "_"
+#    broadcast "%{_bounds::*}% // %{_str}% // %{_mine::*}% // %{_edited_block}%"
     "%{_bounds::1}%" contains "mines"
     cancel drops
-    wait 1 tick
-    event is not cancelled
     if {mines::created_mines::%{_mine::2}%::blocks::%{_edited_block}%::*} is not set:
         set {_block} to {_edited_block}
         replace "_" in {_block} with " "
         set event-block to {_block} parsed as an itemtype
         stop
     set event-block to bedrock
+
+every 10 minutes:
+    Mines_ResetMine("mine")
 # ---------------[ EVENTS ]--------------- #
 
 
