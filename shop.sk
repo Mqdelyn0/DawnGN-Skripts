@@ -93,14 +93,15 @@ function sellItem(plr: player, cost: number, amount: integer, item: itemtype):
         replace " item" in {_message} with ""
         send {_message} to {_plr}
 
-function buyCommand(plr: player, cost: number, name: string, command: string):
+function buyGenerator(plr: player):
     set {_uuid} to uuid of {_plr}
-    if Money_Get({_plr}) >= {_cost}:
-        Money_Remove({_plr}, {_cost})
-        send "{@message_prefix} {@color_first}You sold {@color_second}%{_item}% {@color_first}for {@color_second}$%{_cost}%" to {_plr}
+    if Money_Get({_plr}) >= 250:
+        Money_Remove({_plr}, 250)
+        Gens_GiveGen({_plr}, "coal_ore", 1)
+        send "{@message_prefix} {@color_first}You bought a {@color_second}Coal Generator {@color_first}for {@color_second}$250" to {_plr}
         execute console command "%{_command}%"
     else:
-        send "{@message_prefix} {@color_first}You don't have enough for {@color_second}%{_name}%" to {_plr}
+        send "{@message_prefix} {@color_first}You don't have enough for {@color_second}a Coal Generator." to {_plr}
 
 function buyItemAmount(plr: player, cost: number, item: itemtype, amount: integer = 0, recall: boolean = false):
     set {_uuid} to uuid of {_plr}
@@ -854,7 +855,7 @@ function shopGen(plr: player):
             make next gui slot with {@filler}
 # First Row of the category
         make gui slot 11 with coal block named "&8Coal &7[Unreliable Generator]" with lore " ", "{@color_first}Buy it for:{@color_second} $250 (Left Click)" and " ":
-            buyCommand({_plr}, 250, "&8Coal &7[Unreliable Generator]", "/gens give %player% coal_ore 1")
+            buyGenerator({_plr})
         make gui slot 15 with name tag named "{@color_third}How do you upgrade your generator?" with lore " ", "{@color_first}You can upgrade your generator", "{@color_first}by shift right clicking the generator." and " "
     open last gui to {_plr}
 
