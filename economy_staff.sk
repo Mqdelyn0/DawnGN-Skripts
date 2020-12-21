@@ -148,4 +148,42 @@ command /balance [<player>]:
             send "{@message_prefix} {@color_first}Your current balance: {@color_second}$%Money_Get(player)%"
         if arg-1 is set:
             send "{@message_prefix} {@color_first}%arg-1%{@color_first}'s current balance: {@color_second}$%Money_Get(arg-1)%"
+
+command /pay [<player>] [<number>]:
+    trigger:
+        if arg-1 is set:
+            if arg-2 is set:
+                if Money_Get(player) >= arg-2:
+                    Money_Add(arg-1, arg-2)
+                    Money_Remove(player, arg-2)
+                    send "{@message_prefix} {@color_first}You paid {@color_second}%arg-1% {@color_second}$%arg-2%"
+                    send "{@message_prefix} {@color_first}You received {@color_second}$%arg-2% {@color_first}from {@color_second}%player%" to arg-1
+                else:
+                    send "{@message_prefix} {@color_error}You don't have enough money to pay"
+                    stop
+            else:
+                send "{@message_prefix} {@color_error}Correct usage: /pay <player> <amount>"
+                stop
+        else:
+            send "{@message_prefix} {@color_error}Correct usage: /pay <player> <amount>"
+            stop
+
+command /crystalpay [<player>] [<number>]:
+    trigger:
+        if arg-1 is set:
+            if arg-2 is set:
+                if Crystals_Get(player) >= arg-2:
+                    Crystals_Add(arg-1, arg-2)
+                    Crystals_Remove(player, arg-2)
+                    send "{@message_prefix} {@color_first}You paid {@color_second}%arg-1% {@color_second}%arg-2% {@color_second}crystals"
+                    send "{@message_prefix} {@color_first}You received {@color_second}%arg-2% {@color_second}crystals {@color_first}from {@color_second}%player%" to arg-1
+                else:
+                    send "{@message_prefix} {@color_error}You don't have enough crystals to pay"
+                    stop
+            else:
+                send "{@message_prefix} {@color_error}Correct usage: /crystalpay <player> <amount>"
+                stop
+        else:
+            send "{@message_prefix} {@color_error}Correct usage: /crystalpay <player> <amount>"
+            stop
 # ---------------[ COMMANDS ]--------------- #
