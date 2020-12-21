@@ -102,7 +102,9 @@ on join:
 on join:
     while player is online:
         while {leveling::current_exp::%player's uuid%} >= ({leveling::needed_exp::%{leveling::current_level::%player's uuid%}%}+({leveling::current_prestige::%player's uuid%}*0.75)):
-            addLevel(player)
+            if {leveling::current_level::%player's uuid%} <= 100:
+                addLevel(player)
+                wait 5 ticks
             wait 5 ticks
         wait 5 ticks
 
